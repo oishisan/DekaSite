@@ -11,7 +11,7 @@ echo'
 		<tr>
 			<td><input type="submit" name="login" value="Login"></td>
 		</tr>';
-if(isset($errormsg)) echo '<tr><td>',$errormsg,'</td></tr>';
+if(isset($errormsg)) echo '<tr><td>',entScape($errormsg),'</td></tr>';
 echo'
 	</form>
 </table>';

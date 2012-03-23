@@ -3,12 +3,12 @@ $result = mssql_query("SELECT user_id FROM account.dbo.Tbl_user WHERE user_no = 
 $row = mssql_fetch_row($result);
 echo '
 <table>
-	<form method=POST>
+	<form method="POST">
 		<tr>
 			<td>Change Password</td>
 		</tr>
 		<tr>
-			<td>Account: ',$row[0],'</td>
+			<td>Account: ',entScape($row[0]),'</td>
 		</tr>
 		<tr>
 			<td>Old Password:<br><input type="password" name="old"></td>

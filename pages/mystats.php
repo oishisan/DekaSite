@@ -1,7 +1,7 @@
 <?php
 $query = mssql_query("SELECT character_name ,dwPVPpoint, wWinRecord, wLoseRecord from character.dbo.user_character where user_no = '".mssql_escape($_SESSION['user_no'])."' order by dwPVPpoint desc, wWinRecord asc, wLoseRecord asc");
 $count = mssql_num_rows($query);
-echo '<table><tr><td colspan=:5">PVP Stats</tr>';
+echo '<table><tr><td colspan="5">PVP Stats</tr>';
 if ($count > 0)
 {
 	echo '
@@ -16,10 +16,10 @@ if ($count > 0)
 	{
 		echo '
 		<tr>
-			<td>',htmlspecialchars($list[0]),'</td>
-			<td>',htmlspecialchars($list[1]),'</td>
-			<td>',htmlspecialchars($list[2]),'</td>
-			<td>',htmlspecialchars($list[3]),'</td>
+			<td>',entScape($list[0]),'</td>
+			<td>',entScape($list[1]),'</td>
+			<td>',entScape($list[2]),'</td>
+			<td>',entScape($list[3]),'</td>
 			<td>';
 		if (($list[3] == 0 && $list[2] > 0) || ($list[2] ==0 && $list[3]==0))
 		{
@@ -27,7 +27,7 @@ if ($count > 0)
 		}
 		else
 		{
-			echo htmlspecialchars(round($list[2]/$list[3], 2));
+			echo entScape(round($list[2]/$list[3], 2));
 		}
 		echo '</td></tr>';
 	}
