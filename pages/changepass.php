@@ -33,10 +33,6 @@ if(isset($_POST['upass']))
 	{
 		echo 'You have not filled in all fields.';
 	}
-	elseif(!preg_match("/[0-9a-zA-Z]?/", $_POST['new1']))
-	{
-		echo 'The password contains characters which are not allowed in the password.';
-	}
 	elseif(strlen($_POST['new1']) < 3)
 	{
 		echo 'The password must be at least 3 characters long.';

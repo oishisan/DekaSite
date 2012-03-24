@@ -44,18 +44,6 @@ if(isset($_POST['sub']))
 	{
 		echo 'The passwords do not match.';
 	}
-	elseif($_POST['accpass1'] == $_POST['accname'])
-	{
-		echo 'Account name and password \'t be the same.';
-	}
-	elseif(!preg_match("/^[0-9a-zA-Z]{3,15}$/i", $_POST['accname']))
-	{
-		echo 'Enter a account name only with 0-9, a-z and A-Z.';
-	}
-	elseif(!preg_match("/^[0-9a-zA-Z]{3,15}$/i", $_POST['accpass1']))
-	{
-		echo 'Enter a password only with 0-9 , a-z and A-Z.';
-	}
 	elseif(!preg_match("/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/i",$_POST['accmail']))
 	{
 		echo 'You have entered and invalid e-mail format.';
