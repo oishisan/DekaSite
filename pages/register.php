@@ -21,9 +21,9 @@ echo '
 
 if(isset($_POST['sub']))
 {
-	$result1 = mssql_query("SELECT * FROM account.dbo.USER_PROFILE WHERE user_id = '".mssql_escape($_POST['accname'])."'");
-	$result2 = mssql_query("SELECT * FROM account.dbo.Tbl_user WHERE user_id = '".mssql_escape($_POST['accname'])."'");
-	$result3 = mssql_query("SELECT * FROM account.dbo.Tbl_user WHERE user_mail = '".mssql_escape($_POST['accmail'])."'");
+	$result1 = msquery("SELECT user_id FROM account.dbo.USER_PROFILE WHERE user_id = '%s'", $_POST['accname']);
+	$result2 = msquery("SELECT user_id FROM account.dbo.Tbl_user WHERE user_id = '%s'", $_POST['accname']);
+	$result3 = msquery("SELECT user_mail FROM account.dbo.Tbl_user WHERE user_mail = '%s'", $_POST['accmail']);
 	$row1 = mssql_num_rows($result1);
 	$row2 = mssql_num_rows($result2);
 	$row3 = mssql_num_rows($result3);
@@ -60,10 +60,10 @@ if(isset($_POST['sub']))
 	{
 		$dk_time=strftime("%y%m%d%H%M%S");
 		list($usec1, $sec1) = explode(" ",microtime());
-		$dk_user_no=$dk_time.substr($usec1,2,2);
+		$dknum=$dk_time.substr($usec1,2,2);
 		$accpass = md5($_POST['accpass1']);
-		mssql_query("INSERT INTO account.dbo.USER_PROFILE (user_no,user_id,user_pwd,resident_no,user_type,login_flag,login_tag,ipt_time,login_time,logout_time,user_ip_addr,server_id) VALUES ('".mssql_escape($dk_user_no)."','".mssql_escape($_POST['accname'])."','".mssql_escape($accpass)."','801011000000','1','0','Y','".mssql_escape($date)."',null,null,null,'000')");
-		mssql_query("INSERT INTO account.dbo.Tbl_user (user_no,user_id,user_mail) VALUES ('".mssql_escape($dk_user_no)."','".mssql_escape($_POST['accname'])."','".mssql_escape($_POST['accmail'])."')");
+		msquery("INSERT INTO account.dbo.USER_PROFILE (user_no,user_id,user_pwd,resident_no,user_type,login_flag,login_tag,ipt_time,login_time,logout_time,user_ip_addr,server_id,user_reg_date) VALUES ('%s','%s','%s','801011000000','1','0','Y','1/1/1900',null,null,null,'000',getdate())", $dknum, $_POST['accname'], $accpass);
+		msquery("INSERT INTO account.dbo.Tbl_user (user_no,user_id,user_mail) VALUES ('%s','%s','%s')", $dknum, $_POST['accname'], $_POST['accmail']);
 		echo 'The account was successfully created.';
 	}
 	echo '</td></tr>';

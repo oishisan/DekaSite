@@ -9,9 +9,5 @@ if(!empty($_GET['do']))
 	{
 		include $_SESSION['aSites']['side'][$_GET['do']][0];
 	}
-	else
-	{
-		echo 'Error 404: Page not found.';
-	}
 }
 ?>

@@ -2,7 +2,7 @@
 echo '<table>';
 if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['charname']))
 {
-	$query = mssql_query("select account.dbo.user_profile.login_flag from account.dbo.user_profile left join character.dbo.user_character on character.dbo.user_character.user_no = account.dbo.user_profile.user_no where character_name = '".mssql_escape($_POST['charname'])."'");
+	$query = msquery("select account.dbo.user_profile.login_flag from account.dbo.user_profile left join character.dbo.user_character on character.dbo.user_character.user_no = account.dbo.user_profile.user_no where character_name = '%s'", $_POST['charname']);
 	$count = mssql_num_rows($query);
 	if ($count == 1)
 	{
@@ -16,11 +16,11 @@ if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['ch
 			{
 				$name = '['.$_POST['charauth'].']'.$name;
 			}
-			$query = mssql_query("select character_name from character.dbo.user_character where character_name = '".mssql_escape($name)."'");
+			$query = msquery("select character_name from character.dbo.user_character where character_name = '%s'", $name);
 			$count = mssql_num_rows($query);
 			if ($count == 0)
 			{
-				mssql_query("UPDATE character.dbo.user_character set character_name = '".mssql_escape($name)."' where character_name = '".mssql_escape($_POST['charname'])."'");
+				msquery("UPDATE character.dbo.user_character set character_name = '%s' where character_name = '%s'", $name, $_POST['charname']);
 				echo '<tr><td>',entScape($_POST['charname']),' has been succesfully renamed to ',entScape($name),'.</td></tr>';
 			}
 			else
@@ -41,11 +41,11 @@ if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['ch
 }
 elseif (!empty($_GET['acct']))
 {
-	$query = mssql_query("SELECT account from ".mssql_escape($ini['MSSQL']['extraDB']).".dbo.auth where account = '".mssql_escape($_GET['acct'])."'");
+	$query = msquery("SELECT account from %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_GET['acct']);
 	$count = mssql_num_rows($query);
 	if ($count == '1')
 	{
-		$query = mssql_query("select character_name from character.dbo.user_character left join account.dbo.tbl_user on account.dbo.tbl_user.user_no = character.dbo.user_character.user_no where account.dbo.tbl_user.user_id = '".mssql_escape($_GET['acct'])."'");
+		$query = msquery("select character_name from character.dbo.user_character left join account.dbo.tbl_user on account.dbo.tbl_user.user_no = character.dbo.user_character.user_no where account.dbo.tbl_user.user_id = '%s'", $_GET['acct']);
 		echo '<form action="?do='.entScape($_GET['do']).'" method="post"><tr><td>Character: <select name=charname>';
 		while($fetch = mssql_fetch_array($query))
 		{
@@ -78,12 +78,12 @@ else
 {
 	if($_GET['type'] == 'Delete' && !empty($_GET['delacct']))
 	{
-		mssql_query("DELETE FROM ".mssql_escape($ini['MSSQL']['extraDB']).".dbo.auth where account = '".mssql_escape($_GET['delacct'])."'");
+		msquery("DELETE FROM %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_GET['delacct']);
 		echo '<tr><td>Account ',entScape($_GET['delacct']),' successfully removed!</td></tr></table>';
 	}
 	elseif(empty($_POST['type']))
 	{
-		$acctQuery = mssql_query("SELECT * FROM ".mssql_escape($ini['MSSQL']['extraDB']).".dbo.auth");
+		$acctQuery = msquery("SELECT * FROM %s.dbo.auth", $ini['MSSQL']['extrasDB']);
 		echo '
 		<form action="?do='.entScape($_GET['do']).'" method="POST">
 			<tr>
@@ -128,7 +128,7 @@ else
 		{
 			$_POST['auth'] = $ini['Other']['lvl.GM'];
 		}
-		mssql_query("INSERT INTO ".mssql_escape($ini['MSSQL']['extraDB']).".dbo.auth (account, auth, news) values ('".mssql_escape($_POST['acct'])."','".mssql_escape($_POST['auth'])."','".mssql_escape($_POST['news'])."')");
+		msquery("INSERT INTO %s.dbo.auth (account, auth, news) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['news']);
 		echo '<tr><td>Account ',entScape($_POST['acct']),' successfully added!</td></tr></table>';
 	}
 	else

@@ -1,5 +1,5 @@
 <?php
-$query = mssql_query("SELECT character_name ,dwPVPpoint, wWinRecord, wLoseRecord from character.dbo.user_character where user_no = '".mssql_escape($_SESSION['user_no'])."' order by dwPVPpoint desc, wWinRecord asc, wLoseRecord asc");
+$query = msquery("SELECT character_name ,dwPVPpoint, wWinRecord, wLoseRecord from character.dbo.user_character where user_no = '%s' order by dwPVPpoint desc, wWinRecord asc, wLoseRecord asc", $_SESSION['user_no']);
 $count = mssql_num_rows($query);
 echo '<table><tr><td colspan="5">PVP Stats</tr>';
 if ($count > 0)
