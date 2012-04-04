@@ -1,5 +1,5 @@
 <?php
-$result = msquery("SELECT user_id FROM account.dbo.Tbl_user WHERE user_no = '%s'", $_SESSION['user_no']);
+$result = msquery("SELECT user_id FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
 $row = mssql_fetch_row($result);
 echo '
 <table>

@@ -4,7 +4,7 @@ session_start();
 require 'config/core.php';
 echo '
 <html>
-	<title>Simple Dekaron</title>
+	<title>DekaSite</title>
 	<head></head>
 	<body><center>';
 		include 'config/top.php'; echo'</center>
