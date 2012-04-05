@@ -16,18 +16,18 @@ if ($count > 0)
 	{
 		echo '
 		<tr>
-			<td>',entScape($list[0]),'</td>
-			<td>',entScape($list[1]),'</td>
-			<td>',entScape($list[2]),'</td>
-			<td>',entScape($list[3]),'</td>
+			<td>',entScape($list['character_name']),'</td>
+			<td>',entScape($list['dwPVPpoint']),'</td>
+			<td>',entScape($list['wWinRecord']),'</td>
+			<td>',entScape($list['wLoseRecord']),'</td>
 			<td>';
-		if (($list[3] == 0 && $list[2] > 0) || ($list[2] ==0 && $list[3]==0))
+		if (($list['wLoseRecord'] == 0 && $list['wWinRecord'] > 0) || ($list['wWinRecord'] ==0 && $list['wLoseRecord']==0))
 		{
 			echo '<b>Undefeated!</b>';
 		}
 		else
 		{
-			echo entScape(round($list[2]/$list[3], 2));
+			echo entScape(round($list['wWinRercord']/$list['wLoseRecord'], 2));
 		}
 		echo '</td></tr>';
 	}

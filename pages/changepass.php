@@ -8,7 +8,7 @@ echo '
 			<td>Change Password</td>
 		</tr>
 		<tr>
-			<td>Account: ',entScape($row[0]),'</td>
+			<td>Account: ',entScape($row['user_id']),'</td>
 		</tr>
 		<tr>
 			<td>Old Password:<br><input type="password" name="old"></td>
@@ -41,7 +41,7 @@ if(isset($_POST['upass']))
 	{
 		echo 'The new passwords do not match!';
 	}
-	elseif($count1[0] <> md5($_POST['old']))
+	elseif($count1['user_pwd'] <> md5($_POST['old']))
 	{
 		echo 'Invalid password!';
 	}

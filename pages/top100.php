@@ -45,7 +45,7 @@ elseif($_GET['type'] == 'pk')
 		{
 			if (preg_match ('/<color=(.*)>(.*)/', $list['guild_name'], $matchesarray))
 			{
-				if(!preg_match ('/[a-fA-F0-9]{6}/', $matchesarray[1], $matchesarray2))
+				if(!preg_match ('/[a-fA-F0-9]{6}/', $matchesarray[1]))
 				{
 					echo '<td>',entScape($list['guild_name']),'</td>';
 					
@@ -78,7 +78,7 @@ else
 		{
 			if (preg_match ('/<color=(.*)>(.*)/', $list['guild_name'], $matchesarray))
 			{
-				if(!preg_match ('/[a-fA-F0-9]{6}/', $matchesarray[1], $matchesarray2))
+				if(!preg_match ('/[a-fA-F0-9]{6}/', $matchesarray[1]))
 				{
 					echo '<td>',entScape($list['guild_name']),'</td>';					
 				}

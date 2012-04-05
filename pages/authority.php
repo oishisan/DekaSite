@@ -7,7 +7,7 @@ if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['ch
 	if ($count == 1)
 	{
 		$fetch = mssql_fetch_array($query);
-		if ($fetch[0] == '0')
+		if ($fetch['login_flag'] == '0')
 		{
 			$name = str_replace('[GM]', '', $_POST['charname']);
 			$name = str_replace('[DEV]', '', $name);
@@ -49,7 +49,7 @@ elseif (!empty($_GET['acct']))
 		echo '<form action="?do='.entScape($_GET['do']).'" method="post"><tr><td>Character: <select name=charname>';
 		while($fetch = mssql_fetch_array($query))
 		{
-			echo '<option value="',entScape($fetch[0]),'" selected>',entScape($fetch[0]),'</option>';
+			echo '<option value="',entScape($fetch['character_name']),'" selected>',entScape($fetch[0]),'</option>';
 		}
 		echo '</select></td></tr>
 			<tr>
@@ -93,14 +93,14 @@ else
 			</tr>';
 		while ($acct = mssql_fetch_array($acctQuery))
 		{
-			if ($acct[1] == '3'){$acct[1] = 'Admin';}
-			if ($acct[1] == '2'){$acct[1] = 'GM';}
+			if ($acct['auth'] == '3'){$acct[1] = 'Admin';}
+			if ($acct['auth'] == '2'){$acct[1] = 'GM';}
 			echo '
 			<tr>
-				<td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct[0]),'">',entScape($acct[0]),'</a></td>
-				<td>',entScape($acct[1]),'</td>
-				<td>',entScape($acct[2]),'</td>
-				<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct[0]),'">Remove</a></td>
+				<td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct['account']),'">',entScape($acct['account']),'</a></td>
+				<td>',entScape($acct['auth']),'</td>
+				<td>',entScape($acct['news']),'</td>
+				<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct['account']),'">Remove</a></td>
 			</tr>';
 		}
 		echo '

@@ -1,9 +1,9 @@
 <?php
-if(isset($_POST['CharList'])&& isset($_POST['buy']))
+if(isset($_POST['CharList'])&& isset($_POST['buy']) && ($_POST['bType'] == 'coin' || $_POST['bType'] ==  'dil'))
 {
 	if(!ctype_digit($_POST['amount']))
 	{
-		echo 'Amount must be integers only.';
+		echo 'Amount must be a positive integer only.';
 	}
 	else
 	{
@@ -17,15 +17,40 @@ if(isset($_POST['CharList'])&& isset($_POST['buy']))
 				$char = mssql_fetch_array($charQuery);
 				if ($char['num'] == 1)
 				{
-					if($char[0] >= ($_POST['amount'] * $ini['Other']['dilbank.price']))
+					if($_POST['bType'] == 'coin')
 					{
-						msquery("UPDATE character.dbo.user_character SET dwMoney = dwMoney - %s where user_no = '%s' and character_name = '%s'", ($_POST['amount'] * $ini['Other']['dilbank.price']), $_SESSION['user_no'], $_POST['CharList']);
-						msquery("UPDATE cash.dbo.user_cash SET amount = amount + %s where user_no = '%s'", $_POST['amount'] ,$_SESSION['user_no']);
-						echo 'You have successfully bought ',entScape($_POST['amount']),' coin(s).';
+						$cost = $_POST['amount'] * $ini['Other']['dilbank.price'];
+						if($char['dwMoney'] >= $cost)
+						{
+							msquery("UPDATE character.dbo.user_character SET dwMoney = dwMoney - %s where user_no = '%s' and character_name = '%s'", $cost, $_SESSION['user_no'], $_POST['CharList']);
+							msquery("UPDATE cash.dbo.user_cash SET amount = amount + %s where user_no = '%s'", $_POST['amount'], $_SESSION['user_no']);
+							echo 'You have successfully bought ',entScape($_POST['amount']),' coin(s).';
+						}
+						else
+						{
+							echo 'You do not have enough dil to buy that many coins.';
+						}
 					}
 					else
 					{
-						echo 'You do not have enough dil to buy that many coins.';
+						$cost = ceil($_POST['amount'] / $ini['Other']['dilbank.price']);
+						if ($arrayQ['amount'] >= $cost)
+						{
+							if( ($char['amount'] + $_POST['amount']) > 1000000000)
+							{
+								echo 'You cannot carry that much dil';
+							}
+							else
+							{
+								msquery("UPDATE character.dbo.user_character SET dwMoney = dwMoney + %s where user_no = '%s' and character_name = '%s'", $_POST['amount'], $_SESSION['user_no'], $_POST['CharList']);
+								msquery("UPDATE cash.dbo.user_cash SET amount = amount - %s where user_no = '%s'", $cost, $_SESSION['user_no']);
+								echo 'You have successfully bought ',entScape($_POST['amount']),' dil.';
+							}
+						}
+						else
+						{
+							echo 'You do not have enough coins to buy that much dil.';
+						}
 					}
 				}
 				else
@@ -50,9 +75,10 @@ $characters = mssql_num_rows($charQuery);
 if ($characters > 0)
 {
 	echo '
-	<br><br>',$ini['Other']['dilbank.price'],' dil is worth 1 coin.
+	<br><br>Dil to Coin ratio <b>',entScape($ini['Other']['dilbank.price']),' :1</b>.
 	<form action="?do=',$_GET['do'],'" method="POST">
-	How many coins do you want to buy? <input type="text" name="amount" /><br>';
+	Buy: <input type="radio" name="bType" value="dil" />Dil    <input type="radio" name="bType" value="coin" />Coins<br>
+	How much do you want to buy? <input type="text" name="amount" /><br>';
 	echo 'Which character do you want to use?<select name="CharList">';
 	while ($charList = mssql_fetch_array($charQuery))
 	{

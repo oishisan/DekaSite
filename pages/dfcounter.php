@@ -3,7 +3,7 @@ $hour_wars = array();
 $query = mssql_query("Select sort_cd from character.dbo.cm_bcd_item order by orderby_no asc");
 while ($fetch = mssql_fetch_array($query))
 {
-$hour_wars[] = $fetch[0];
+$hour_wars[] = $fetch['sort_cd'];
 }
 $search = array_search(0, $hour_wars);
 if ($search !== false)
@@ -37,7 +37,7 @@ function convert_to_time_x1500(secs_x1500)
 	mm_x1500 = mmt_x1500 / 60;
 	mm_x1500 = parseInt(mm_x1500);
 	ss_x1500 = mmt_x1500 - (mm_x1500 * 60);
-	
+
 	if (hh_x1500 > 23)
 	{
 		dd_x1500 = hh_x1500 / 24;
@@ -46,7 +46,7 @@ function convert_to_time_x1500(secs_x1500)
 	}
 	else
 	{ dd_x1500 = 0; }
-	
+
 	if (ss_x1500 < 10) { ss_x1500 = "0"+ss_x1500; }
 	if (mm_x1500 < 10) { mm_x1500 = "0"+mm_x1500; }
 	if (hh_x1500 < 10) { hh_x1500 = "0"+hh_x1500; }
