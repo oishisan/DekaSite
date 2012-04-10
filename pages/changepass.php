@@ -1,15 +1,7 @@
 <?php
-$result = msquery("SELECT user_id FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
-$row = mssql_fetch_row($result);
 echo '
 <table>
 	<form method="POST">
-		<tr>
-			<td>Change Password</td>
-		</tr>
-		<tr>
-			<td>Account: ',entScape($row['user_id']),'</td>
-		</tr>
 		<tr>
 			<td>Old Password:<br><input type="password" name="old"></td>
 		</tr>
@@ -48,7 +40,7 @@ if(isset($_POST['upass']))
 	else
 	{
 		msquery("UPDATE account.dbo.USER_PROFILE SET user_pwd = '%s' WHERE user_no = '%s'", md5($_POST['new1']), $_SESSION['user_no']);
-		echo "Your password has been successfully updated.";
+		echo 'Your password has been successfully updated.';
 	}
 }
 ?>

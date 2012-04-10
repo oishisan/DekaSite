@@ -46,10 +46,10 @@ elseif (!empty($_GET['acct']))
 	if ($count == '1')
 	{
 		$query = msquery("select character_name from character.dbo.user_character left join account.dbo.tbl_user on account.dbo.tbl_user.user_no = character.dbo.user_character.user_no where account.dbo.tbl_user.user_id = '%s'", $_GET['acct']);
-		echo '<form action="?do='.entScape($_GET['do']).'" method="post"><tr><td>Character: <select name=charname>';
+		echo '<form action="?do=',entScape($_GET['do']),'" method="post"><tr><td>Character: <select name=charname>';
 		while($fetch = mssql_fetch_array($query))
 		{
-			echo '<option value="',entScape($fetch['character_name']),'" selected>',entScape($fetch[0]),'</option>';
+			echo '<option value="',entScape($fetch['character_name']),'" selected>',entScape($fetch['character_name']),'</option>';
 		}
 		echo '</select></td></tr>
 			<tr>
@@ -83,7 +83,7 @@ else
 	}
 	elseif(empty($_POST['type']))
 	{
-		$acctQuery = msquery("SELECT * FROM %s.dbo.auth", $ini['MSSQL']['extrasDB']);
+		$acctQuery = msquery("SELECT * FROM %s.dbo.auth order by auth desc", $ini['MSSQL']['extrasDB']);
 		echo '
 		<form action="?do='.entScape($_GET['do']).'" method="POST">
 			<tr>
@@ -93,13 +93,13 @@ else
 			</tr>';
 		while ($acct = mssql_fetch_array($acctQuery))
 		{
-			if ($acct['auth'] == '3'){$acct[1] = 'Admin';}
-			if ($acct['auth'] == '2'){$acct[1] = 'GM';}
+			if ($acct['auth'] == '3'){$acct['auth'] = 'Admin';}
+			if ($acct['auth'] == '2'){$acct['auth'] = 'GM';}
 			echo '
 			<tr>
 				<td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct['account']),'">',entScape($acct['account']),'</a></td>
 				<td>',entScape($acct['auth']),'</td>
-				<td>',entScape($acct['news']),'</td>
+				<td>',entScape($acct['webName']),'</td>
 				<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct['account']),'">Remove</a></td>
 			</tr>';
 		}
@@ -108,7 +108,7 @@ else
 				<td colspan="4">Account: <input type="text" name="acct" /></td>
 			</tr>
 			<tr>
-				<td colspan="4">Web name: <input type="text" name="news" /></td>
+				<td colspan="4">Web name: <input type="text" name="webName" /></td>
 			</tr>
 			<tr>
 				<td colspan="4">Authority: <select name="auth"><option value="GM" selected>GM</option><option value="Admin">Admin</option></select></td>
@@ -118,7 +118,7 @@ else
 			</tr>
 		</form>';
 	}
-	elseif($_POST['type'] == 'Add' && !empty($_POST['acct']) && !empty($_POST['auth']) && !empty($_POST['news']))
+	elseif($_POST['type'] == 'Add' && !empty($_POST['acct']) && !empty($_POST['auth']) && !empty($_POST['webName']))
 	{
 		if($_POST['auth'] == 'Admin')
 		{
@@ -128,7 +128,7 @@ else
 		{
 			$_POST['auth'] = $ini['Other']['lvl.GM'];
 		}
-		msquery("INSERT INTO %s.dbo.auth (account, auth, news) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['news']);
+		msquery("INSERT INTO %s.dbo.auth (account, auth, webName) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['webName']);
 		echo '<tr><td>Account ',entScape($_POST['acct']),' successfully added!</td></tr></table>';
 	}
 	else

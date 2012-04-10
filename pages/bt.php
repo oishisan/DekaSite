@@ -4,10 +4,16 @@ if(isset($_POST['build']))
 	echo 'Non-existing tabels built.<br>';
 	// create sessionlog
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'sessionlog' and xtype = 'U') CREATE TABLE %s.dbo.sessionlog (wTime datetime, Account varchar(50), IP varchar(50), wAction varchar(50))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	// create news table
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_news' and xtype = 'U') CREATE TABLE %s.dbo.site_news (sid int PRIMARY KEY IDENTITY, title varchar (80) null, wroteby varchar (50), wrotedate varchar(50), content text null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	// create downloads table
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_download' and xtype = 'U') CREATE TABLE %s.dbo.site_download (sid int, link varchar (500) null, name varchar(60) null, version varchar(50) null, descr varchar (1000))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	// create ban table
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'banned' and xtype = 'U') CREATE TABLE %s.dbo.banned (wDate datetime null, accountname nvarchar (60), reason nvarchar (765), wBy varchar (50), type char (10))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	if(isset($_POST['authN']) && isset($_POST['authID']))
 	{
 		// create auth table
-		msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'auth' and xtype = 'U') CREATE TABLE %s.dbo.auth (account varchar(16), auth int, news varchar (16))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+		msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'auth' and xtype = 'U') CREATE TABLE %s.dbo.auth (account varchar(16), auth int, webName varchar (16))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 		// insert inital ID
 		msquery("INSERT INTO %s.dbo.auth values ('%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_POST['authID'], $ini['Other']['lvl.Admin'], $_POST['authN']);
 		echo 'Authorization initialized.<br>It is suggested that you move the Build Tables page to Administrators only level.<br>';

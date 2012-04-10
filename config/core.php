@@ -1,5 +1,21 @@
 ﻿<?php
-$ini = parse_ini_file('config.ini', true); //Parse config.ini
+// Check for faggot quotes
+if(get_magic_quotes_gpc())
+{
+	echo 'Please set magic_quotes_gpc to "Off" in your php.ini.';
+	exit(0);
+}
+if(get_magic_quotes_runtime())
+{
+    set_magic_quotes_runtime(false);
+}
+
+// Set compression
+ini_set('zlib.output_compression', 'On');
+
+
+// Parse Config.ini
+$ini = parse_ini_file('config.ini', true);
 
 //Connect to the database
 $ms_con = mssql_pconnect($ini['MSSQL']['host'],$ini['MSSQL']['user'],$ini['MSSQL']['password']);
@@ -12,6 +28,10 @@ if ($ms_con == false)
 }
 
 /*
+**********************************************************************************
+* This function is here to maintain compatibility from my previous website until *
+* 				merging is complete.				 *
+**********************************************************************************
 Function to escape MSSQL strings and deny queries with greater than 100 characters.
 
 Parameters:
@@ -40,8 +60,9 @@ function msquery()
 	{
 		$array = array();
 		for($i=1;$i < $num; $i++)
-		{
-			$array[] = mssql_escape($args[$i]);
+		{	
+			// Escape all input data.
+			$array[] = preg_replace('/\'/','\'\'', $args[$i]);
 		}
 		return mssql_query(vsprintf($args[0], $array),$GLOBALS['ms_con']);
 	}
@@ -148,7 +169,7 @@ function authPages(&$settings, &$allow)
 		}
 		if($settings['MSSQL']['extras'] == true)
 		{
-			//Add GM pages
+			// Add GM pages
 			if($_SESSION['auth'] > $settings['Other']['lvl.member'])
 			{
 				if(array_key_exists('GM', $settings['whitelist.top']))
@@ -168,7 +189,7 @@ function authPages(&$settings, &$allow)
 					}
 				}
 			}
-			//Add Admin pages
+			// Add Admin pages
 			if($_SESSION['auth'] > $settings['Other']['lvl.GM'])
 			{
 				if(array_key_exists('Admin', $settings['whitelist.top']))
@@ -209,21 +230,24 @@ function requireExtras()
 	}
 }
 
+
 /*
 Function to record actions into session log
 
 Parameters:
-	$action		The action to use in the database
+$action		The action to use in the database
+[$sAcct]	Account to record into the log
 */
-function sessionLog($action)
+function sLog($action, $sAcct = NULL)
 {
 	if($GLOBALS['ini']['MSSQL']['extras'] == true)
 	{
-		msquery("INSERT INTO %s.dbo.sessionlog values (getdate(),'%s', '%s', '%s')",$GLOBALS['ini']['MSSQL']['extrasDB'],$_SESSION['accname'],$_SERVER['REMOTE_ADDR'], $action);
+		if($sAcct == NULL) $sAcct = $_SESSION['accname'];
+		msquery("INSERT INTO %s.dbo.sessionlog values (getdate(),'%s', '%s', '%s')",$GLOBALS['ini']['MSSQL']['extrasDB'],$sAcct,$_SERVER['REMOTE_ADDR'], $action);
 	}
 }
 
-//Login backend
+// Login backend
 if(!isset($_SESSION['auth']))
 {
 	$_SESSION['auth'] = $ini['Other']['lvl.guest'];
@@ -233,6 +257,7 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['
 	if (isset($_POST['login']) && $_SESSION['auth'] == 0)
 	{
 		$accountInfo = msquery("SELECT user_no, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' AND user_pwd = '%s' AND login_tag = 'Y' GROUP BY user_no",$_POST['accname'],md5($_POST['accpass']));
+		
 	}
 	else
 	{
@@ -243,18 +268,22 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['
 		$getAccount = mssql_fetch_array($accountInfo);
 		if ($getAccount['num'] == 1)
 		{
-			if (isset($_POST['login']) && $_SESSION['auth'] == 0) $_SESSION['accname'] = $_POST['accname'];
-			$_SESSION['user_no'] = $getAccount[0];;
+			if (isset($_POST['login']) && $_SESSION['auth'] == 0) 
+			{
+				$_SESSION['accname'] = $_POST['accname'];
+				sLog('Login success');
+			}
+			$_SESSION['user_no'] = $getAccount['user_no'];
 			if($ini['MSSQL']['extras'] == true)
 			{
-				$authQ = msquery("Select auth,news, count(auth) as num FROM %s.dbo.auth where account ='%s' group by auth,news",$ini['MSSQL']['extrasDB'],$_SESSION['accname']);
+				$authQ = msquery("Select auth,webName, count(auth) as num FROM %s.dbo.auth where account ='%s' group by auth,webName",$ini['MSSQL']['extrasDB'],$_SESSION['accname']);
 				$authA = mssql_fetch_array($authQ);
 				if($authA['num'] == 1)
 				{
 					if($_SESSION['auth'] != $authA['auth'])
 					{
 						$_SESSION['auth'] = $authA['auth'];
-						$_SESSION['news'] = $authA['news'];
+						$_SESSION['webName'] = $authA['webName'];
 					}
 				}
 				else
@@ -270,6 +299,7 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['
 		elseif ($getAcount['num'] == 0)
 		{
 			$errormsg = 'Invalid username or password.';
+			sLog('Login failure', $_POST['accname']);
 		}
 		else
 		{
