@@ -17,14 +17,8 @@ if(!empty($_POST['select']) && !empty($_POST['charname']))
 		$fetchQ = mssql_fetch_array($query);
 		if ($fetchQ['num'] == 1)
 		{
-			if(msquery("update cash.dbo.user_cash set amount = amount + '%s' - '%s' from cash.dbo.user_cash join character.dbo.user_character on character.dbo.user_character.user_no = cash.dbo.user_cash.user_no where character_name= '%s'", $_POST['coinsP'], $_POST['coinsM'], $_POST['charname']))
-			{
-				echo entScape($_POST['charname']),' was given ',entScape($_POST['coinsP']),' coins and had ',entScape($_POST['coinsM']),' coins taken.';
-			}
-			else
-			{
-				echo 'Failed to distribute coins.';
-			}
+			msquery("update cash.dbo.user_cash set amount = amount + '%s' - '%s' from cash.dbo.user_cash join character.dbo.user_character on character.dbo.user_character.user_no = cash.dbo.user_cash.user_no where character_name= '%s'", $_POST['coinsP'], $_POST['coinsM'], $_POST['charname']);
+			echo entScape($_POST['charname']),' was given ',entScape($_POST['coinsP']),' coins and had ',entScape($_POST['coinsM']),' coins taken.';
 		}
 		else
 		{

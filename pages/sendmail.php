@@ -30,14 +30,8 @@ if(isset($_POST['send']))
 		if (empty($_POST['dil'])) $_POST['dil'] = '0';
 		if (empty($_POST['itemid'])) $_POST['itemid'] = '0';
 		if (empty($_POST['from'])) $_POST['from'] = '[Anonymous]';
-		if(msquery("EXEC character.dbo.SP_POST_SEND_OP '%s','%s',1,'%s','%s','%s','%s',0", $cFetch['character_no'], $_POST['from'], $_POST['subject'], $_POST['message'], $_POST['itemid'], $_POST['dil']))
-		{
-			echo 'Mail has been sent successfully to ',entScape($_POST['charname']),'.';
-		}
-		else
-		{
-			echo 'Failed to send mail.';
-		}
+		msquery("EXEC character.dbo.SP_POST_SEND_OP '%s','%s',1,'%s','%s','%s','%s',0", $cFetch['character_no'], $_POST['from'], $_POST['subject'], $_POST['message'], $_POST['itemid'], $_POST['dil']);
+		echo 'Mail has been sent successfully to ',entScape($_POST['charname']),'.';
 	}
 }
 

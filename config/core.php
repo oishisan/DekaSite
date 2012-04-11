@@ -28,24 +28,6 @@ if ($ms_con == false)
 }
 
 /*
-**********************************************************************************
-* This function is here to maintain compatibility from my previous website until *
-* 				merging is complete.				 *
-**********************************************************************************
-Function to escape MSSQL strings and deny queries with greater than 100 characters.
-
-Parameters:
-	$str	The string that is to be escaped
-	
-Return value:
-	string	The escaped string
-*/
-function mssql_escape($str)
-{
-	return preg_replace('/\'/','\'\'', $str);
-}
-
-/*
 Function to query mssql safely
 
 Parameters:
@@ -64,11 +46,29 @@ function msquery()
 			// Escape all input data.
 			$array[] = preg_replace('/\'/','\'\'', $args[$i]);
 		}
-		return mssql_query(vsprintf($args[0], $array),$GLOBALS['ms_con']);
+		$query = mssql_query(vsprintf($args[0], $array),$GLOBALS['ms_con']);
+		if($query)
+		{
+			return $query;
+		}
+		else
+		{
+			echo '<br>Query failed!</br>';
+			exit(0);
+		}
 	}
 	else
 	{
-		return mssql_query($args[0],$GLOBALS['ms_con']);
+		$query = mssql_query($args[0],$GLOBALS['ms_con']);
+		if($query)
+		{
+			return $query;
+		}
+		else
+		{
+			echo '<br>Query failed!</br>';
+			exit (0);
+		}
 	}
 }
 

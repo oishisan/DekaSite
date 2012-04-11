@@ -2,25 +2,19 @@
 echo '<table>';
 if ($_GET['action'] == "add")
 {
-	if(msquery("INSERT INTO %s.dbo.site_download (link, name, version, descr) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['link'], $_POST['name'], $_POST['version'], $_POST['descr']))
-	{
-		echo '<tr><td>The download is added.</td></tr>';
-	}
+	msquery("INSERT INTO %s.dbo.site_download (link, name, version, descr) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['link'], $_POST['name'], $_POST['version'], $_POST['descr']);
+	echo '<tr><td>The download is added.</td></tr>';
 }
 
 if ($_GET['action'] == "remove"){
-	if(msquery("DELETE FROM %s.dbo.site_download WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']))
-	{
-		echo '<tr><td>The download is deleted.</td></tr>';
-	}
+	msquery("DELETE FROM %s.dbo.site_download WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']);
+	echo '<tr><td>The download is deleted.</td></tr>';
 }
 
 if ($_GET['action'] == "edit")
 {
-	if(msquery("UPDATE %s.dbo.site_download SET name = '%s',version = '%s',link = '%s',descr = '%s' WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_POST['name'], $_POST['version'], $_POST['link'], $_POST['descr'], $_GET['sid']))
-	{
-		echo '<tr><td>The download has been edited.</td></tr>';
-	}
+	msquery("UPDATE %s.dbo.site_download SET name = '%s',version = '%s',link = '%s',descr = '%s' WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_POST['name'], $_POST['version'], $_POST['link'], $_POST['descr'], $_GET['sid']);
+	echo '<tr><td>The download has been edited.</td></tr>';
 }
 
 if ($_GET['part'] == "edit")
