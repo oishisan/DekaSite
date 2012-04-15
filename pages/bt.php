@@ -13,7 +13,7 @@ if(isset($_POST['build']))
 	// create vote table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'vote' and xtype = 'U') CREATE TABLE %s.dbo.vote (link varchar (50), account varchar (50), ip varchar (50), wDate datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);	
 	// create events table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'event' and xtype = 'U') CREATE TABLE %s.dbo.event (eID PRIMARY KEY IDENTITY, eName varchar (50) null, eHost varchar (50), eStart datetime, eEnd datetime, eDesc varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);	
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'event' and xtype = 'U') CREATE TABLE %s.dbo.event (eID int PRIMARY KEY IDENTITY, eName varchar (50) null, eHost varchar (50), eStart datetime, eEnd datetime, eDesc varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 
 	if(isset($_POST['authN']) && isset($_POST['authID']))
 	{
