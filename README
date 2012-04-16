@@ -18,8 +18,9 @@ Adding extras features
 1. Create a database with the same name specified by extrasDB setting in 
 config.ini. The specified user also needs to be able to have same privileges as 
 the other dekaron tables require.
-2. Uncomment (remove ;) from the build tables page in the white list.
+2. Uncomment (remove ;) from the update tables page in the white list.
 3. Visit build tables page in browser and follow directions from there.
+4. Remember, each time you update your DekaSite pages from the GitRepo, update your tables after.
 
 Issues
 ------

@@ -9,15 +9,15 @@ if(isset($_POST['build']))
 	// create downloads table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_download' and xtype = 'U') CREATE TABLE %s.dbo.site_download (sid int PRIMARY KEY IDENTITY, link varchar (500) null, name varchar(60) null, version varchar(50) null, descr varchar (1000))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create ban table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'banned' and xtype = 'U') CREATE TABLE %s.dbo.banned (wDate datetime null, accountname nvarchar (60), reason nvarchar (765), wBy varchar (50), type char (10))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'banned' and xtype = 'U') CREATE TABLE %s.dbo.banned (wDate datetime null, accountname nvarchar (60) default('<none>'), reason nvarchar (765) default('no reason'), wBy varchar (50) default('<no one>'), type char (10))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create vote table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'vote' and xtype = 'U') CREATE TABLE %s.dbo.vote (link varchar (50), account varchar (50), ip varchar (50), wDate datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);	
 	// create events table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'event' and xtype = 'U') CREATE TABLE %s.dbo.event (eID int PRIMARY KEY IDENTITY, eName varchar (50) null, eHost varchar (50), eStart datetime, eEnd datetime, eDesc varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);	
 	// create experience banking table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'blist' and xtype = 'U') CREATE TABLE %s.dbo.blist (auctionID bigint PRIMARY KEY IDENTITY,aid varchar (50), exp bigint, coins int default(0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'blist' and xtype = 'U') CREATE TABLE %s.dbo.blist (auctionID bigint PRIMARY KEY IDENTITY, aid varchar (50) collate database_default, exp bigint, coins int default(0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create userExt table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20), user_id varchar (20), exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20) collate database_default, user_id varchar (20) collate database_default, exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
 	while($iFetch = mssql_fetch_array($iQuery))
