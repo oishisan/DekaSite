@@ -4,7 +4,7 @@ session_start();
 require 'config/core.php';
 echo '
 <html>
-	<title>',$ini['Other']['site.title'],'</title>
+	<title>',entScape($ini['Other']['site.title']),'</title>
 	<head>
 	<style type="text/css">';
         include $ini['Other']['site.css'];

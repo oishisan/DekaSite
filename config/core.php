@@ -222,7 +222,7 @@ database.
 */
 function requireExtras()
 {
-	if($GLOBALS['ini']['MSSQL']['extras'] == false)
+	if((boolean)$GLOBALS['ini']['MSSQL']['extras'] === false)
 	{
 		echo 'This page requires DekaSite\'s extra content to be enabled.';
 		include 'footer.php';

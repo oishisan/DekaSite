@@ -45,7 +45,7 @@ elseif (!empty($_GET['acct']))
 	$count = mssql_num_rows($query);
 	if ($count == '1')
 	{
-		$query = msquery("select character_name from character.dbo.user_character left join account.dbo.tbl_user on account.dbo.tbl_user.user_no = character.dbo.user_character.user_no where account.dbo.tbl_user.user_id = '%s'", $_GET['acct']);
+		$query = msquery("select character_name from character.dbo.user_character left join account.dbo.user_profile on account.dbo.user_profile.user_no = character.dbo.user_character.user_no where account.dbo.user_profile.user_id = '%s'", $_GET['acct']);
 		echo '<form action="?do=',entScape($_GET['do']),'" method="post"><tr><td>Character: <select name=charname>';
 		while($fetch = mssql_fetch_array($query))
 		{

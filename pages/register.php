@@ -39,8 +39,11 @@ if(isset($_POST['sub']))
 		$dk_time=strftime("%y%m%d%H%M%S");
 		list($usec1, $sec1) = explode(" ",microtime());
 		$dknum=$dk_time.substr($usec1,2,2);
-		$accpass = md5($_POST['accpass1']);
-		msquery("INSERT INTO account.dbo.USER_PROFILE (user_no,user_id,user_pwd,resident_no,user_type,login_flag,login_tag,ipt_time,login_time,logout_time,user_ip_addr,server_id,user_reg_date) VALUES ('%s','%s','%s','801011000000','1','0','Y','1/1/1900',null,null,null,'000',getdate())", $dknum, $_POST['accname'], $accpass);
+		msquery("INSERT INTO account.dbo.USER_PROFILE (user_no,user_id,user_pwd,resident_no,user_type,login_flag,login_tag,ipt_time,login_time,logout_time,user_ip_addr,server_id,user_reg_date) VALUES ('%s','%s','%s','801011000000','1','0','Y','1/1/1900',null,null,null,'000',getdate())", $dknum, $_POST['accname'], md5($_POST['accpass1']));
+		if((boolean)$ini['MSSQL']['extras'] === true)
+		{
+			msquery("INSERT INTO %s.dbo.userExt (user_no, user_id) values ('%s', '%s')", $ini['MSSQL']['extrasDB'], $dknum, $_POST['accname']);
+		}
 		echo 'The account was successfully created.';
 	}
 	echo '</td></tr>';
