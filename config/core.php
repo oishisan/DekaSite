@@ -130,7 +130,7 @@ Parameters:
 function authPages(&$settings, &$allow)
 {
 	$allow = NULL;
-	if($_SESSION['auth'] == $settings['Other']['lvl.guest'])
+	if($_SESSION['auth'] == 'guest')
 	{
 		if(array_key_exists('guest', $settings['whitelist.top']))
 		{
@@ -169,46 +169,48 @@ function authPages(&$settings, &$allow)
 		}
 		if($settings['MSSQL']['extras'] == true)
 		{
-			// Add GM pages
-			if($_SESSION['auth'] > $settings['Other']['lvl.member'])
+			if($_SESSION['auth'] != 'member')
 			{
-				if(array_key_exists('GM', $settings['whitelist.top']))
+				if(isset($settings['Other']['i.'.$_SESSION['auth']]))
 				{
-					foreach($settings['whitelist.top']['GM'] as $val)
+					foreach($settings['Other']['i.'.$_SESSION['auth']] as $i)
+					{
+						if(array_key_exists($i, $settings['whitelist.top']))
+						{
+							foreach($settings['whitelist.top'][$i] as $val)
+							{
+								$allow['top'][splitWV($val,2)][0] = splitWV($val);
+								$allow['top'][splitWV($val,2)][1] = splitWV($val,1);
+							}
+						}
+						if(array_key_exists($i, $settings['whitelist.side']))
+						{
+							foreach($settings['whitelist.side'][$i] as $val)
+							{
+								$allow['side'][splitWV($val,2)][0] = splitWV($val);
+								$allow['side'][splitWV($val,2)][1] = splitWV($val,1);
+							}
+						}
+					}
+				}
+				if(array_key_exists($_SESSION['auth'], $settings['whitelist.top']))
+				{
+					foreach($settings['whitelist.top'][$SESSION['auth']] as $val)
 					{
 						$allow['top'][splitWV($val,2)][0] = splitWV($val);
 						$allow['top'][splitWV($val,2)][1] = splitWV($val,1);
 					}
 				}
-				if(array_key_exists('GM', $settings['whitelist.side']))
+				if(array_key_exists($_SESSION['auth'], $settings['whitelist.side']))
 				{
-					foreach($settings['whitelist.side']['GM'] as $val)
+					foreach($settings['whitelist.side'][$_SESSION['auth']] as $val)
 					{
 						$allow['side'][splitWV($val,2)][0] = splitWV($val);
 						$allow['side'][splitWV($val,2)][1] = splitWV($val,1);
 					}
 				}
 			}
-			// Add Admin pages
-			if($_SESSION['auth'] > $settings['Other']['lvl.GM'])
-			{
-				if(array_key_exists('Admin', $settings['whitelist.top']))
-				{
-					foreach($settings['whitelist.top']['Admin'] as $val)
-					{
-						$allow['top'][splitWV($val,2)][0] = splitWV($val);
-						$allow['top'][splitWV($val,2)][1] = splitWV($val,1);
-					}
-				}
-				if(array_key_exists('Admin', $settings['whitelist.side']))
-				{
-					foreach($settings['whitelist.side']['Admin'] as $val)
-					{
-						$allow['side'][splitWV($val,2)][0] = splitWV($val);
-						$allow['side'][splitWV($val,2)][1] = splitWV($val,1);
-					}
-				}
-			}
+		
 		}
 	}
 }
@@ -250,11 +252,11 @@ function sLog($action, $sAcct = NULL)
 // Login backend
 if(!isset($_SESSION['auth']))
 {
-	$_SESSION['auth'] = $ini['Other']['lvl.guest'];
+	$_SESSION['auth'] = 'guest';
 }
-elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['accname']) && $_SESSION['auth'] > $ini['Other']['lvl.guest']))
+elseif ((isset($_POST['login']) && $_SESSION['auth'] == 'guest') || (isset($_SESSION['accname']) && $_SESSION['auth'] != 'guest' ))
 {
-	if (isset($_POST['login']) && $_SESSION['auth'] == 0)
+	if (isset($_POST['login']) && $_SESSION['auth'] == 'guest')
 	{
 		$accountInfo = msquery("SELECT user_no, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' AND user_pwd = '%s' AND login_tag = 'Y' GROUP BY user_no",$_POST['accname'],md5($_POST['accpass']));
 		
@@ -268,7 +270,7 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['
 		$getAccount = mssql_fetch_array($accountInfo);
 		if ($getAccount['num'] == 1)
 		{
-			if (isset($_POST['login']) && $_SESSION['auth'] == 0) 
+			if (isset($_POST['login']) && $_SESSION['auth'] == 'guest') 
 			{
 				$_SESSION['accname'] = $_POST['accname'];
 				sLog('Login success');
@@ -288,12 +290,12 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 0) || (isset($_SESSION['
 				}
 				else
 				{
-					$_SESSION['auth'] = $ini['Other']['lvl.member'];
+					$_SESSION['auth'] = 'member';
 				}
 			}
 			else
 			{
-				$_SESSION['auth'] = $ini['Other']['lvl.member'];
+				$_SESSION['auth'] = 'member';
 			}
 		}
 		elseif ($getAcount['num'] == 0)

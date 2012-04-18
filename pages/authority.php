@@ -75,65 +75,55 @@ elseif (!empty($_GET['acct']))
 	}
 }
 else
-{
-	if($_GET['type'] == 'Delete' && !empty($_GET['delacct']))
+{	
+	if(isset($_GET['type']) && !empty($_GET['delacct']))
 	{
 		msquery("DELETE FROM %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_GET['delacct']);
-		echo '<tr><td>Account ',entScape($_GET['delacct']),' successfully removed!</td></tr></table>';
+		echo '<tr><td colspan="4">Account ',entScape($_GET['delacct']),' successfully removed!</td></tr>';
 	}
-	elseif(empty($_POST['type']))
+	if(isset($_POST['type']) && !empty($_POST['acct']) && !empty($_POST['auth']) && !empty($_POST['webName']))
 	{
-		$acctQuery = msquery("SELECT * FROM %s.dbo.auth order by auth desc", $ini['MSSQL']['extrasDB']);
-		echo '
-		<form action="?do='.entScape($_GET['do']).'" method="POST">
-			<tr>
-				<td><u>Account</u></td>
-				<td><u>Authority</u></td>
-				<td><u>Web Name</u></td>
-			</tr>';
-		while ($acct = mssql_fetch_array($acctQuery))
+		$query = msquery("SELECT account FROM %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_POST['acct']);
+		if(mssql_num_rows($query) == 0)
 		{
-			if ($acct['auth'] == '3'){$acct['auth'] = 'Admin';}
-			if ($acct['auth'] == '2'){$acct['auth'] = 'GM';}
-			echo '
-			<tr>
-				<td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct['account']),'">',entScape($acct['account']),'</a></td>
-				<td>',entScape($acct['auth']),'</td>
-				<td>',entScape($acct['webName']),'</td>
-				<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct['account']),'">Remove</a></td>
-			</tr>';
-		}
-		echo '
-			<tr>
-				<td colspan="4">Account: <input type="text" name="acct" /></td>
-			</tr>
-			<tr>
-				<td colspan="4">Web name: <input type="text" name="webName" /></td>
-			</tr>
-			<tr>
-				<td colspan="4">Authority: <select name="auth"><option value="GM" selected>GM</option><option value="Admin">Admin</option></select></td>
-			</tr>
-			<tr>
-				<td colspan="4"><input name="type" type="submit" value="Add"/></td>
-			</tr>
-		</form>';
-	}
-	elseif($_POST['type'] == 'Add' && !empty($_POST['acct']) && !empty($_POST['auth']) && !empty($_POST['webName']))
-	{
-		if($_POST['auth'] == 'Admin')
-		{
-			$_POST['auth'] = $ini['Other']['lvl.Admin'];
+			msquery("INSERT INTO %s.dbo.auth (account, auth, webName) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['webName']);
+			echo '<tr><td colspan="4">Account ',entScape($_POST['acct']),' successfully added!</td></tr>';
 		}
 		else
 		{
-			$_POST['auth'] = $ini['Other']['lvl.GM'];
+			msquery("UPDATE %s.dbo.auth set auth = '%s', webName = '%s' WHERE account ='%s'", $ini['MSSQL']['extrasDB'], $_POST['auth'], $_POST['webName'], $_POST['acct']);
+			echo '<tr><td colspan="4">Account ',entScape($_POST['acct']),' successfully updated!</td></tr>';
 		}
-		msquery("INSERT INTO %s.dbo.auth (account, auth, webName) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['webName']);
-		echo '<tr><td>Account ',entScape($_POST['acct']),' successfully added!</td></tr></table>';
-	}
-	else
+	}	
+	$acctQuery = msquery("SELECT * FROM %s.dbo.auth order by auth asc", $ini['MSSQL']['extrasDB']);
+	echo '
+	<form action="?do='.entScape($_GET['do']).'" method="POST">
+		<tr>
+			<td><u>Account</u></td>
+			<td><u>Authority</u></td>
+			<td><u>Web Name</u></td>
+		</tr>';
+	while ($acct = mssql_fetch_array($acctQuery))
 	{
-		echo '<tr><td>Invalid action!</td></tr></table>';
+		echo '<tr><td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct['account']),'">',entScape($acct['account']),'</a></td>
+		<td>',entScape($acct['auth']),'</td>
+		<td>',entScape($acct['webName']),'</td>
+		<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct['account']),'">Remove</a></td>
+		</tr>';
 	}
+	echo '
+		<tr>
+			<td colspan="4">Account: <input type="text" name="acct" /></td>
+		</tr>
+		<tr>
+			<td colspan="4">Web name: <input type="text" name="webName" /></td>
+		</tr>
+		<tr>
+			<td colspan="4">Authority: <input type="text" name="auth" /></td>
+		</tr>
+		<tr>
+			<td colspan="4"><input name="type" type="submit" value="Add/Update"/></td>
+		</tr>
+	</form>';
 }
 ?>

@@ -15,22 +15,28 @@ if(isset($_POST['build']))
 	// create events table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'event' and xtype = 'U') CREATE TABLE %s.dbo.event (eID int PRIMARY KEY IDENTITY, eName varchar (50) null, eHost varchar (50), eStart datetime, eEnd datetime, eDesc varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);	
 	// create experience banking table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'blist' and xtype = 'U') CREATE TABLE %s.dbo.blist (auctionID bigint PRIMARY KEY IDENTITY, aid varchar (50) collate database_default, exp bigint, coins int default(0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'blist' and xtype = 'U') CREATE TABLE %s.dbo.blist (auctionID bigint PRIMARY KEY IDENTITY, aid varchar (50) collate Chinese_PRC_CI_AS, exp bigint, coins int default(0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create userExt table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20) collate database_default, user_id varchar (20) collate database_default, exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20) collate Chinese_PRC_CI_AS, user_id varchar (20) collate Chinese_PRC_CI_AS, exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
 	while($iFetch = mssql_fetch_array($iQuery))
 	{
 		msquery("INSERT INTO %s.dbo.userExt (user_no, user_id) values ('%s', '%s')", $ini['MSSQL']['extrasDB'], $iFetch['user_no'], $iFetch['user_id']);
 	}
-	if(isset($_POST['authN']) && isset($_POST['authID']))
+	if(isset($_POST['authN']) && isset($_POST['authID']) && isset($_POST['auth']))
 	{
 		// create auth table
-		msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'auth' and xtype = 'U') CREATE TABLE %s.dbo.auth (account varchar(16), auth int, webName varchar (16))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+		msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'auth' and xtype = 'U') CREATE TABLE %s.dbo.auth (account varchar(20), auth varchar (20), webName varchar (16))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 		// insert inital ID
-		msquery("INSERT INTO %s.dbo.auth values ('%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_POST['authID'], $ini['Other']['lvl.Admin'], $_POST['authN']);
+		msquery("INSERT INTO %s.dbo.auth values ('%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_POST['authID'], $_POST['auth'], $_POST['authN']);
 		echo 'Authorization initialized.<br>It is suggested that you move the Build Tables page to Administrators only level.<br>';
+	}
+	if(isset($_POST['p15']) && $_POST['p15'] == true)
+	{
+		msquery("ALTER TABLE %s.dbo.auth ALTER COLUMN auth varchar (20) NOT NULL", $ini['MSSQL']['extrasDB']);
+		msquery("UPDATE %s.dbo.auth SET auth = 'Admin' WHERE auth = '3'; UPDATE %s.dbo.auth SET auth = 'GM' where auth = '2'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+		echo 'Patch 1.5 applied.<br>';
 	}
 	echo 'You may enable extras features.';
 }
@@ -43,7 +49,11 @@ else
 		if(mssql_num_rows($aQuery) == 0)
 		{
 			echo 'Your authorization tables haven\'t been built. Please enter an account ID to be designated as the inital administrator.
-			<br>User ID: <input type="text" name="authID" /><br>Site display: <input type="text" name="authN" /><br>';
+			<br>User ID: <input type="text" name="authID" /><br>Authority: <input type="text" name="auth" value="Admin" /><br>Web name: <input type="text" name="authN" /><br>';
+		}
+		else
+		{
+			echo'<br><input type="checkbox" name="p15" /> Apply patch 1.5 (only needed if upgrading from pre-v1.5)<br>';
 		}
 		echo'<input type="submit" name="build" value="Build Tables" /></form>';
 	}

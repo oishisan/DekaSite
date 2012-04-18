@@ -19,9 +19,40 @@ Adding extras features
 config.ini. The specified user also needs to be able to have same privileges as 
 the other dekaron tables require.
 2. Uncomment (remove ;) from the update tables page in the white list.
-3. Visit build tables page in browser and follow directions from there.
-4. Remember, each time you update your DekaSite pages from the GitRepo, update your tables after.
+3. Visit "update tables" page in browser and follow directions from there.
+4. Remember, each time you update your DekaSite pages from the GitRepo, update 
+your tables after.
 
+Authorization and inheritance system
+------------------------------------
+If you have extras content enabled, you can create your own authorization 
+"levels" for people who are logged in. This means that you can choose what 
+group of people get to see what pages. The levels of "guest" and "member" are 
+constant and cannot be changed. "Guest" pages are the pages everyone who 
+isn't logged in can see, and "Member" pages are pages that everyone who is 
+logged in can see.
+
+---Authorization system---
+Creating a new authorzation level is as simple as naming it. In the "whitelist" 
+sections of the config.ini, just create a name with [] after it and set it 
+equal to the pages it's allowed to view. Authorization levels only see their 
+whitelisted pages + members unless inheritance is specified. By default in the 
+config.ini, I have created two custom levels and divided the pages for GMs and 
+Admins as I saw fit, however, feel free to change them.
+
+Example: If I wanted to create a level for VIP only members to view experience 
+banking, I would remove it from "members[]" and set it equal to something else 
+like "vip[]".
+---Inheritance system---
+It's an optional system designed to save you typing. For each inherited 
+"level", it is invoked in the "Other" section of the "config.ini" with the 
+syntax "i.NAME[]" where "NAME" is the heir and set equal to the inheritance. 
+
+Example: I want "Admin" to inherit "GM" pages so I make the setting called 
+"i.Admin[] = GM". If i wanted to to inherit vip pages too, I just add a new 
+line "i.Admin[] = vip".
+
+------
 Issues
 ------
 If you have problems setting this up, feel free to post or PM me on 

@@ -2,7 +2,7 @@
 requireExtras();
 echo '<table>
 <tr><td colspan="4">Experience Bank</td></tr>
-<tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Visit Bank</a> | <a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=listing">Check Listings</a></td></tr>
+<tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a> | <a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=listing">Listings</a></td></tr>
 </table>';
 if($_GET['type'] == 'gift')
 {
@@ -12,8 +12,7 @@ if($_GET['type'] == 'gift')
 		if(ctype_digit($_POST['sendExp']))
 		{
 			$query = msquery("SELECT (amount + free_amount) as coins, exp from cash.dbo.user_cash left join %s.dbo.userExt on cash.dbo.user_cash.user_no = %s.dbo.userExt.user_no where cash.dbo.user_cash.user_no = '%s'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-			$count = mssql_num_rows($query);
-			if ($count == 1)
+			if (mssql_num_rows($query) == 1)
 			{
 				$fetch = mssql_fetch_array($query);
 				if ($fetch['coins'] >= $ini['Other']['expbank.giftprice'] && $fetch['exp'] >= $_POST['sendExp'])
@@ -39,12 +38,12 @@ if($_GET['type'] == 'gift')
 			}
 			else
 			{
-				echo 'You have not visited the d-shop and, therefore, do not have enough coins!';
+				echo 'You have not visited the d-shop in game.';
 			}
 		}
 		else
 		{
-			echo 'Experience only consists of whole numbers!';
+			echo 'Experience only consists of whole numbers.';
 		}
 	}
 	$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
@@ -84,23 +83,27 @@ elseif($_GET['type'] == 'list')
 		}
 		else
 		{
-			
-
-			$infoQuery = msquery("SELECT exp from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-			$info = mssql_fetch_array($infoQuery);
-			if ($info['exp'] >= $_POST['exp'])
+			$query = msquery("SELECT amount from cash.dbo.user_cash where cash.dbo.user_cash.user_no = '%s'", $_SESSION['user_no']);
+			if (mssql_num_rows($query) == 1)
 			{
-				$exp = $info['exp'] - $_POST['exp'];
-				msquery("UPDATE %s.dbo.userExt SET exp = '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], ($info['exp'] - $_POST['exp']), $_SESSION['user_no']);
-				msquery("INSERT INTO %s.dbo.blist (aid, exp, coins) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_SESSION['user_no'], $_POST['exp'], $_POST['dcoins']);
-				echo 'You have successfully listed ',entScape($_POST['exp']),' experience for ',entScape($_POST['dcoins']),' D-Coins.';
+				$infoQuery = msquery("SELECT exp from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
+				$info = mssql_fetch_array($infoQuery);
+				if ($info['exp'] >= $_POST['exp'])
+				{
+					$exp = $info['exp'] - $_POST['exp'];
+					msquery("UPDATE %s.dbo.userExt SET exp = '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], ($info['exp'] - $_POST['exp']), $_SESSION['user_no']);
+					msquery("INSERT INTO %s.dbo.blist (aid, exp, coins) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_SESSION['user_no'], $_POST['exp'], $_POST['dcoins']);
+					echo 'You have successfully listed ',entScape($_POST['exp']),' experience for ',entScape($_POST['dcoins']),' D-Coins.';
+				}
+				else
+				{
+					echo 'You don\'t have that much experience in your bank to list!';
+				}
 			}
 			else
 			{
-				echo 'You don\'t have that much experience in your bank to list!';
+				echo 'You have not visited the D-Shop in game.';
 			}
-			
-			
 		}
 	}
 	$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
@@ -194,7 +197,7 @@ elseif($_GET['type'] == 'listing')
 	}
 	else
 	{
-		echo 'You have not visited the d-shop yet in-game. You cannot participate in buying experience!';
+		echo 'You have not visited the d-shop in game.';
 	}
 }
 else 
