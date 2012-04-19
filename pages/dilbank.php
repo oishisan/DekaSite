@@ -1,7 +1,12 @@
 <?php
 requireExtras();
-echo'<a href="?do=',entScape($_GET['do']),'&action=bank">Bank</a> | <a href="?do=',entScape($_GET['do']),'&action=buy">Buy</a><br>';
-if($_GET['action'] == 'buy')
+echo'<a href="?do=',entScape($_GET['do']),'&action=bank">Bank</a>';
+if($ini['Other']['dilbank.buyEnabled'] == true)
+{
+	echo ' | <a href="?do=',entScape($_GET['do']),'&action=buy">Buy</a>';
+}
+echo '<br>';
+if($_GET['action'] == 'buy' && $ini['Other']['dilbank.buyEnabled'] == true)
 {
 	if(isset($_POST['buy']) && ($_POST['bType'] == 'coin' || $_POST['bType'] ==  'dil'))
 	{

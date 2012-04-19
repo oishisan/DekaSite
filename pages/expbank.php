@@ -2,9 +2,17 @@
 requireExtras();
 echo '<table>
 <tr><td colspan="4">Experience Bank</td></tr>
-<tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a> | <a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=listing">Listings</a></td></tr>
-</table>';
-if($_GET['type'] == 'gift')
+<tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a>';
+if($ini['Other']['expbank.giftEnabled'] == true)
+{
+	echo ' | <a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a>';
+}
+if($ini['Other']['expbank.listEnabled'] == true)
+{
+	echo '| <a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=listing">Listings</a>';
+}
+echo '</td></tr></table>';
+if($_GET['type'] == 'gift' && $ini['Other']['expbank.giftEnabled'] == true)
 {
 	if($_POST['type'] == 'Gift' && !empty($_POST['sendTo']) && !empty($_POST['sendExp']))
 	{
@@ -56,7 +64,7 @@ if($_GET['type'] == 'gift')
 	</form></table>Gifting experience requires ',entScape($ini['Other']['expbank.giftprice']),' D-Coin(s).';
 
 }
-elseif($_GET['type'] == 'list')
+elseif($_GET['type'] == 'list' && $ini['Other']['expbank.listEnabled'] == true)
 {
 	if($_POST['type'] == 'List')
 	{
@@ -115,7 +123,7 @@ elseif($_GET['type'] == 'list')
 	</form></table>';
 
 }
-elseif($_GET['type'] == 'listing')
+elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == true)
 {
 	$acctQuery = msquery("SELECT (amount + free_amount) as total from cash.dbo.user_cash where user_no = '%s'", $_SESSION['user_no']);
 	if (mssql_num_rows($acctQuery) == 1)
