@@ -5,11 +5,11 @@ echo '<table>
 <tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a>';
 if($ini['Other']['expbank.giftEnabled'] == true)
 {
-	echo ' | <a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a>';
+	echo '<a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a>';
 }
 if($ini['Other']['expbank.listEnabled'] == true)
 {
-	echo '| <a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a> | <a href="?do=',entScape($_GET['do']),'&type=listing">Listings</a>';
+	echo '<a href="?do=',entScape($_GET['do']),'&type=list">List Experience</a><a href="?do=',entScape($_GET['do']),'&type=listing">Listings</a>';
 }
 echo '</td></tr></table>';
 if($_GET['type'] == 'gift' && $ini['Other']['expbank.giftEnabled'] == true)

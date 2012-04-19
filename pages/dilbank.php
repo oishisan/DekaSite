@@ -3,7 +3,7 @@ requireExtras();
 echo'<a href="?do=',entScape($_GET['do']),'&action=bank">Bank</a>';
 if($ini['Other']['dilbank.buyEnabled'] == true)
 {
-	echo ' | <a href="?do=',entScape($_GET['do']),'&action=buy">Buy</a>';
+	echo '<a href="?do=',entScape($_GET['do']),'&action=buy">Buy</a>';
 }
 echo '<br>';
 if($_GET['action'] == 'buy' && $ini['Other']['dilbank.buyEnabled'] == true)

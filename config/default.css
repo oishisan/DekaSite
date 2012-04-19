@@ -1,14 +1,55 @@
-#indexTable
+/*
+The IDs of #content, #top, and #side are defined to allow you to set the default values of the content, top menu, and side menu.
+Side menu links are displayed via lists.
+*/
+#content
 {
-border-top: 1px solid black;
+float: left;
+width:80%;
+padding-left:10px;
+text-align:center;
 }
 
-#indexTableTop
+#content table
 {
-padding: 5px 25px;
+margin:auto;
+text-align:center;
 }
 
-#indexTableSide
+#content a
 {
-border-right:1px solid black;
+padding-left: 10px;
 }
+
+#top{
+text-align:center;
+padding-bottom:20px;
+}
+
+#top a
+{
+padding-left: 5px;
+}
+
+#side
+{
+width:20%;
+}
+
+#side ul
+{
+float: left;
+list-style-type: circle;
+text-align: left;
+}
+
+#side ul li a
+{
+text-align: left;
+}
+
+/*
+Dynamic CSS is in order for each page. If you would like to add an ID to specifically modify something on a page you add the ID with the format of #c-(pagename).
+
+Example: I want to modify the color of the links in dilbank.php. I would add #c-dilbank a{color:white;}
+*/
