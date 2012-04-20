@@ -2,6 +2,7 @@
 The IDs of #content, #top, and #side are defined to allow you to set the default values of the content, top menu, and side menu.
 Side menu links are displayed via lists.
 */
+
 #content
 {
 float: left;
@@ -18,7 +19,7 @@ text-align:center;
 
 #content a
 {
-padding-left: 10px;
+margin-left: 10px;
 }
 
 #top{
@@ -26,14 +27,26 @@ text-align:center;
 padding-bottom:20px;
 }
 
+#top #currentp
+{
+padding-left: 10px;
+font-weight:bold;
+}
+
 #top a
 {
 padding-left: 5px;
+color:black;
 }
 
 #side
 {
 width:20%;
+}
+
+#side #currentp
+{
+font-weight:bold;
 }
 
 #side ul
@@ -45,6 +58,7 @@ text-align: left;
 
 #side ul li a
 {
+color:black;
 text-align: left;
 }
 
