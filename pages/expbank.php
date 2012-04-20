@@ -184,7 +184,7 @@ elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == tru
 		$acctCoins = mssql_fetch_array($acctQuery);
 		echo '<table>
 		<tr><td colspan="3">Your D-Coins: ',entscape($acctCoins['total']),'</td></tr>
-		<tr><td>Experience</td><td>Price</td></tr>';
+		<tr><th>Experience</th><th>Price</th></tr>';
 		while ($listings = mssql_fetch_array($listQuery))
 		{
 			echo '<tr><td>',entScape($listings['exp']),'</td><td>',entScape($listings['coins']),'</td>';

@@ -5,11 +5,11 @@ if (mssql_num_rows($query) > 0)
 {
 	echo '
 	<tr>
-		<td>Character</td>
-		<td>Points</td>
-		<td>Wins</td>
-		<td>Losses</td>
-		<td>W/L ratio</td>
+		<th>Character</th>
+		<th>Points</th>
+		<th>Wins</th>
+		<th>Losses</th>
+		<th>W/L ratio</th>
 	</tr>';
 	while($list = mssql_fetch_array($query))
 	{
@@ -22,7 +22,7 @@ if (mssql_num_rows($query) > 0)
 			<td>';
 		if (($list['wLoseRecord'] == 0 && $list['wWinRecord'] > 0) || ($list['wWinRecord'] ==0 && $list['wLoseRecord']==0))
 		{
-			echo '<b>Undefeated!</b>';
+			echo 'Undefeated!';
 		}
 		else
 		{

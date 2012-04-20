@@ -76,8 +76,8 @@ $bQuery = msquery("SELECT wDate, accountname, reason, wBy FROM %s.dbo.banned whe
 if(mssql_num_rows($bQuery) > 0)
 {
 	echo '<table>
-	<tr><td colspan="5">Current bans</td></tr>
-	<tr><td>Date</td><td>Account</td><td>Reason</td><td>Issued by</tr>';
+	<tr><th colspan="5">Current bans</th></tr>
+	<tr><th>Date</th><th>Account</th><th>Reason</th><th>Issued by</th>';
 	while($bFetch = mssql_fetch_array($bQuery)) 
 	{
 		echo '<tr><td>',entScape($bFetch['wDate']),'</td>
@@ -93,10 +93,10 @@ $bQuery = msquery("SELECT wDate, accountname, wBy FROM %s.dbo.banned where type 
 if(mssql_num_rows($bQuery) > 0)
 {
 	echo '<table>
-	<tr><td colspan="4">Unban Log</td></tr>
-	<tr><td>Date</td>
-	<td>Account</td>
-	<td>Issued by</tr>';
+	<tr><th colspan="4">Unban Log</th></tr>
+	<th>Date</th>
+	<th>Account</th>
+	<th>Issued by</th></tr>';
 	while($bFetch = mssql_fetch_array($bQuery)) 
 	{
 		echo '<tr>

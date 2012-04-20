@@ -52,4 +52,7 @@ text-align: left;
 Dynamic CSS is in order for each page. If you would like to add an ID to specifically modify something on a page you add the ID with the format of #c-(pagename).
 
 Example: I want to modify the color of the links in dilbank.php. I would add #c-dilbank a{color:white;}
+
+Also, specific IDs for specific elements are defined for some pages. View the page.php. It will say at the very top of the page in the comments if any specific
+IDs are defined.
 */

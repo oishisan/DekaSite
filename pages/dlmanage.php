@@ -41,7 +41,7 @@ elseif ($_GET['part'] == "new")
 else
 {
 	echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=new">New Download</a></td></tr>
-	<tr><td>Name:</td><td>Version:</td></tr>';
+	<tr><th>Name:</th><th>Version:</th></tr>';
 	$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
 	while($dFetch = mssql_fetch_array($dQuery))
 	{

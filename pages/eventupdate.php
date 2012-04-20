@@ -71,7 +71,7 @@ else
 {
 	echo '<table>
 	<tr><td><a href="?do=',entScape($_GET['do']),'&part=new">Add Event</a></td></tr>
-	<tr><td>Event:</td><td>Host:</td><td>Start Date:<td>End Date:</td></tr>';
+	<tr><th>Event</th><th>Host</th><th>Start Date</th><th>End Date</th></tr>';
 	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB']);
 	while($eFetch = mssql_fetch_array($eQuery))
 	{

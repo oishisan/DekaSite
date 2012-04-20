@@ -99,9 +99,9 @@ else
 	echo '
 	<form action="?do='.entScape($_GET['do']).'" method="POST">
 		<tr>
-			<td>Account</td>
-			<td>Authority</td>
-			<td>Web Name</td>
+			<th>Account</th>
+			<th>Authority</th>
+			<th>Web Name</th>
 		</tr>';
 	while ($acct = mssql_fetch_array($acctQuery))
 	{

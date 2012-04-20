@@ -1,7 +1,7 @@
 <?php
 if ($_GET['part'] == "new")
 {
-	echo '<table><form method="POST" action="?do=',entScape($_GET['do']),'&type=create"><tr><td>News Management</td></tr>
+	echo '<table><form method="POST" action="?do=',entScape($_GET['do']),'&type=create">
 	<tr><td>Title:<br><input type="text" name="title" /></td></tr>
 	<tr><td>Message:<br><textarea cols="75" rows="25" name="content"></textarea></td></tr>
 	<tr><td><input type="submit" value="Create" /></td></tr></form></table>';
@@ -11,7 +11,7 @@ elseif ($_GET['part'] == "edit")
 	$query = msquery("SELECT * FROM %s.dbo.site_news WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']);
 	while($r = mssql_fetch_array($query))
 	{
-		echo '<table><tr><td>News Management</td></tr>
+		echo '<table>
 		<form method="POST" action="?do=',entScape($_GET['do']),'&type=edit">
 		<tr><td><input type="hidden" name="sid" value="',entScape($r['sid']),'" />Title:<br><input type=text name=title value="',entScape($r['title']),'" /></td></tr>
 		<tr><td>Message:<br><textarea cols="75" rows="25" name="content">', entScape($r['content']),'</textarea></td></tr>
@@ -37,7 +37,7 @@ else
 		msquery("INSERT INTO %s.dbo.site_news (title,wroteby,wrotedate,content) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['title'], $_SESSION['webName'], $time, $_POST['content']);
 		echo 'News updated!';
 	}
-	echo '<table><tr><td colspan="5">News Management</td></tr><tr><td><a href="?do=',entScape($_GET['do']),'&part=new">Add News</a></td></tr><tr><td>Title:</td><td>Written By:</td><td>Date:</td></tr>';
+	echo '<table><tr><td><a href="?do=',entScape($_GET['do']),'&part=new">Add News</a></td></tr><tr><th>Title</th><th>Written By</th><th>Date</th></tr>';
 	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
 	while($r = mssql_fetch_array($query))
 	{

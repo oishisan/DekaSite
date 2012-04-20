@@ -1,4 +1,12 @@
 <?php
+/*
+CSS page specific IDs
+---------------------
+#heading	Heading of the news
+#wroteby	The name of the author
+#date		The date
+#news		The news contnent
+*/
 requireExtras();
 $query = msquery("SELECT TOP %s * FROM %s.dbo.site_news ORDER by sid DESC", $ini['Other']['news.amount'], $ini['MSSQL']['extrasDB']);
 echo '<table>';
@@ -7,8 +15,8 @@ if ($count > 0)
 {
 	while($r = mssql_fetch_array($query))
 	{
-		echo '<tr><td>',entScape($r['title']),'
-		<br>Written by ',entScape($r['wroteby']),' at ',entScape($r['wrotedate']),'<br>'.entScape($r['content']).'<br><br></td></tr>';
+		echo '<tr><td><span id="heading">',entScape($r['title']),'</span>
+		<br>Written by <span id="wroteby">',entScape($r['wroteby']),'</span> at <span id="date">',entScape($r['wrotedate']),'</span><br><span id="news">'.entScape($r['content']).'</span></td></tr>';
 	}
 }	
 else

@@ -1,12 +1,16 @@
 <?php
-echo '<table><form action="?do=',entScape($_GET['do']),'" Method="POST">
-<tr><td >Master Lookup</td></tr>
-<tr><td><select name="type">
-	<option value="account" selected>Account</option>
-	<option value="ip">IP</option>
-	<option value="char">Character</option></select>
-	<input name="data" type="text"></td></tr>
-<tr><td><input name="submit" type="submit"value="Go!"></td></tr></form></table>';
+/*
+CSS page specific IDs
+---------------------
+#chars		information containing characters
+#accts		information containing account links
+#ips		information containing ip links
+#heading	the sectional headings of the information
+*/
+echo '<form action="?do=',entScape($_GET['do']),'" Method="POST">
+<select name="type"><option value="account" selected>Account</option><option value="ip">IP</option><option value="char">Character</option></select>
+<input name="data" type="text"><br>
+<input name="submit" type="submit" value="Search!"></form>';
 
 if ((!empty($_POST['data']) && $_POST['type'] == 'account') or ($_GET['type'] == 'account' && !empty($_GET['data'])) or (!empty($_POST['data']) && $_POST['type'] == 'char'))
 {
@@ -41,16 +45,16 @@ if ((!empty($_POST['data']) && $_POST['type'] == 'account') or ($_GET['type'] ==
 	$fetch = mssql_fetch_array($query);
 	if ($fetch['num'] == '1')
 	{
-		echo '<table><tr><td>Account Lookup for ',entScape($data),'</td></tr>';
-		echo '<tr><td>Characters</td></tr>';
+		echo 'Account lookup: ',entScape($data),'<br>';
+		echo '<div id="chars"><span id="heading">Characters</span>';
 		$query2 = msquery("Select character_name from character.dbo.user_character where user_no = '%s'", $fetch['user_no']);
 		while ($fetch2 = mssql_fetch_array($query2))
 		{
-			echo '<tr><td>',entScape($fetch2['character_name']),'</td></tr>';
+			echo '<br>',entScape($fetch2['character_name']);
 		}
 		$linked = array();
 		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data);
-		echo '<tr><td>Account Links</td></tr>';
+		echo '</div><div id="accts"><span id="heading">Account Links</span>';
 		while ($fetch = mssql_fetch_array($query))
 			{
 				$query2 = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id <> '%s' and Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data, $fetch['IP']);
@@ -68,33 +72,29 @@ if ((!empty($_POST['data']) && $_POST['type'] == 'account') or ($_GET['type'] ==
 			$i = 0;
 			do
 			{
-				echo '<tr><td><a href="?do=',entScape($_GET['do']),'&type=account&data=',entScape($linked[$i]),'">',entScape($linked[$i]),'</a></td></tr>';
-				$i += 1;
+				echo '<br><a href="?do=',entScape($_GET['do']),'&type=account&data=',entScape($linked[$i]),'">',entScape($linked[$i]),'</a>';
+				$i++;
 			}while($i < $count);
 		}
 		else
 		{
-			echo '<tr><td>No linked accounts</td></tr>';
+			echo '<br>No linked accounts';
 		}
-		echo '<tr><td>Unique IPs</td></tr>';
+		echo '</div><div id="ips"><span id="heading">Unique IPs</span>';
 		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP, user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data);
 		$rows = mssql_num_rows($query);
 		if ($rows > '0')
 		{
 			while ($fetch = mssql_fetch_array($query))
 			{
-			echo '<tr><td><a href="?do=',entScape($_GET['do']),'&type=ip&data=',entScape($fetch['IP']),'">',entScape($fetch['IP']),'</a></td></tr>';
+			echo '<br><a href="?do=',entScape($_GET['do']),'&type=ip&data=',entScape($fetch['IP']),'">',entScape($fetch['IP']),'</a>';
 			}
 		}
 		else
 		{
-			echo '<tr><td>No linked IPs</td></tr>';
+			echo '<br>No linked IPs';
 		}
-		echo '</table>';
-	}
-	elseif($fetch['num'] > '1')
-	{
-		echo 'Account confliction error! Please inform the administrator.';
+		echo '</div>';
 	}
 	else
 	{
@@ -116,12 +116,11 @@ elseif (!empty($_POST['data']) && $_POST['type'] == 'ip' or ($_GET['type'] == 'i
 	if ($fetch['num'] > '0')
 	{
 		$query = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data);
-		echo '<table><tr><td>IP Lookup for ',entScape($data),'</td></tr>';
+		echo 'IP lookup: ',entScape($data);
 		while ($fetch = mssql_fetch_array($query))
 		{
-			echo '<tr><td><a href="?do=',entScape($_GET['do']),'&type=account&data=',entScape($fetch['user_id']),'">',entScape($fetch['user_id']),'</a></td></tr>';
+			echo '<br><a href="?do=',entScape($_GET['do']),'&type=account&data=',entScape($fetch['user_id']),'">',entScape($fetch['user_id']),'</a>';
 		}
-		echo '</table>';
 	}
 	else
 	{
