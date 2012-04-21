@@ -5,7 +5,7 @@ CSS page specific IDs
 #odd		Odd table rows
 #even		Even table rows
 */
-echo '<table><tr><td colspan="7"><a href="?do=',entScape($_GET['do']),'">Highest levels</a><a href="?do=',entScape($_GET['do']),'&type=pk">PKers</a><a href="?do=',entScape($_GET['do']),'&type=pvp">PvPers</a></td></tr>';
+echo '<a href="?do=',entScape($_GET['do']),'">Highest levels</a><a href="?do=',entScape($_GET['do']),'&type=pk">PKers</a><a href="?do=',entScape($_GET['do']),'&type=pvp">PvPers</a><table>';
 if (empty($_GET['type']))
 {
 	$pplist = msquery("select top %s character.dbo.user_character.character_name, character.dbo.user_character.wLevel, character.dbo.user_character.dwExp, character.dbo.guild_info.guild_name from character.dbo.user_character left join account.dbo.user_profile on character.dbo.user_character.user_no = account.dbo.user_profile.user_no left join character.dbo.guild_char_info on character.dbo.user_character.character_name = character.dbo.guild_char_info.character_name left join character.dbo.guild_info on character.dbo.guild_char_info.guild_code = character.dbo.guild_info.guild_code where account.dbo.user_profile.login_tag <> 'N' and (character.dbo.guild_info.guild_name is null or character.dbo.guild_info.guild_name <> '%s') order by character.dbo.user_character.wLevel Desc, character.dbo.user_character.dwExp desc", $ini['Other']['toprank.amount'], $ini['Other']['toprank.exempt']);
