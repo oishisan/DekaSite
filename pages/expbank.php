@@ -1,8 +1,6 @@
 <?php
 requireExtras();
-echo '<table>
-<tr><td colspan="4">Experience Bank</td></tr>
-<tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a>';
+echo '<table><tr><td><a href="?do=',entScape($_GET['do']),'&type=bank">Bank</a>';
 if($ini['Other']['expbank.giftEnabled'] == true)
 {
 	echo '<a href="?do=',entScape($_GET['do']),'&type=gift">Gift Experience</a>';

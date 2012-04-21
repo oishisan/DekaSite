@@ -10,8 +10,7 @@ CSS page specific IDs
 */
 echo '<form action="?do=',entScape($_GET['do']),'" Method="POST">
 <select name="type"><option value="account" selected>Account</option><option value="ip">IP</option><option value="char">Character</option></select>
-<input name="data" type="text"><br>
-<input name="submit" type="submit" value="Search!"></form>';
+<input name="data" type="text"> <input name="submit" type="submit" value="Search!"></form>';
 
 if ((!empty($_POST['data']) && $_POST['type'] == 'account') || ($_GET['type'] == 'account' && !empty($_GET['data'])))
 {
