@@ -1,6 +1,10 @@
 /*
-The IDs of #content, #top, and #side are defined to allow you to set the default values of the content, top menu, and side menu.
-Side menu links are displayed via lists.
+CSS index specific IDs
+----------------------
+#mContain	Container for content, top, and side
+#content	Content - displayed pages
+#top		Top menu
+#side		Side menu
 */
 
 #content

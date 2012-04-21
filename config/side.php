@@ -1,6 +1,6 @@
 <?php
 if(array_key_exists('side', $_SESSION['aSites']))
-{	echo '<ul id="sidelist">';
+{	echo '<ul>';
 	foreach ($_SESSION['aSites']['side'] as $key=>$val)
 	{
 		if($_GET['do']!= $key)

@@ -1,5 +1,3 @@
 <?php
-echo'
-	</body>
-</html>';
+echo'</body></html>';
 ?>
