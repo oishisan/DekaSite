@@ -22,7 +22,7 @@ if((isset($_POST['search']) || (isset($_POST['update']) && !empty($_POST['oChar'
 				}
 				if($error == null)
 				{
-					msquery("UPDATE character.dbo.user_character SET dwMoney = '%s',dwStoreMoney = '%s',dwStorageMoney = '%s',nHP = '%s',nMP = '%s',wStr = '%s',wCon = '%s',wSpr = '%s',wStatPoint = '%s',wSkillPoint = '%s',wLevel = '%s',byPCClass = '%s',wPKCount = '%s',nShield = '%s',dwPVPPoint = '%s',wWinRecord = '%s',wLoseRecord = '%s' where character_name = '%s'",$_POST['dwMoney'], $_POST['dwStoreMoney'], $_POST['dwStorageMoney'], $_POST['nHP'], $_POST['nMP'], $_POST['wStr'], $_POST['wCon'], $_POST['wSpr'], $_POST['wStatPoint'], $_POST['wSkillPoint'], $_POST['wLevel'], $_POST['byPCClass'], $_POST['wPKCount'], $_POST['nShield'], $_POST['dwPVPPoint'], $_POST['wWinRecord'], $_POST['wLoseRecord'] ,$_POST['oChar']);
+					msquery("UPDATE character.dbo.user_character SET dwMoney = '%s',dwStoreMoney = '%s',dwStorageMoney = '%s',nHP = '%s',nMP = '%s',wStr = '%s', wDex = '%s', wCon = '%s',wSpr = '%s',wStatPoint = '%s',wSkillPoint = '%s',wLevel = '%s',byPCClass = '%s',wPKCount = '%s',nShield = '%s',dwPVPPoint = '%s',wWinRecord = '%s',wLoseRecord = '%s' where character_name = '%s'",$_POST['dwMoney'], $_POST['dwStoreMoney'], $_POST['dwStorageMoney'], $_POST['nHP'], $_POST['nMP'], $_POST['wStr'], $_POST['wDex'], $_POST['wCon'], $_POST['wSpr'], $_POST['wStatPoint'], $_POST['wSkillPoint'], $_POST['wLevel'], $_POST['byPCClass'], $_POST['wPKCount'], $_POST['nShield'], $_POST['dwPVPPoint'], $_POST['wWinRecord'], $_POST['wLoseRecord'] ,$_POST['oChar']);
 					echo 'Character updated successfully.<br>';
 					if($_POST['schar'] != $_POST['oChar'])
 					{
