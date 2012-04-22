@@ -32,7 +32,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 						msquery("INSERT into %s.dbo.rebirth values ('%s','1')", $ini['MSSQL']['extrasDB'], $cFetch['character_no']);
 						$sQuery = msquery("SELECT wStr, wCon, wDex, wSpr, wLevel from character.dbo.user_character where character_no = 'DEKARON%s000001'", $cFetch['byPCClass']); 
 						$sFetch = mssql_fetch_array($sQuery);
-						msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $rArray[1], $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
+						msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $rArray[1], $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
 						echo 'Rebirth successful!<br>';
 					}
 					else
@@ -59,7 +59,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 							$rArray = explode(',',$ini['Other']['rebirth'][$i-1]);
 							$stats += $rArray[1];
 						}
-						msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s'  where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $stats, $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
+						msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $stats, $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
 						echo 'Rebirth successful!<br>';
 					}
 					else
@@ -69,7 +69,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 				}
 				else
 				{
-					echo 'Character has hit maximum rebirths.';
+					echo 'Character has hit maximum rebirths.<br>';
 				}
 			}
 			else
@@ -99,7 +99,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 			if($cFetch['rebirth'] == null) $cFetch['rebirth'] = 0;
 			echo '<option value="',entScape($cFetch['character_name']),'">',entScape($cFetch['character_name']),' (',entScape($cFetch['rebirth']),')</option>';
 		}
-		echo '</select> <input type="submit" name="rebirth" value="Rebirth" /></form>';
+		echo '</select><br><input type="submit" name="rebirth" value="Rebirth" /></form>';
 	}
 	else
 	{

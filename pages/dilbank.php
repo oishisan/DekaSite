@@ -1,12 +1,12 @@
 <?php
 requireExtras();
 echo'<a href="?do=',entScape($_GET['do']),'&action=bank">Bank</a>';
-if($ini['Other']['dilbank.buyEnabled'] == true)
+if($ini['Other']['dilbank.dilEnabled'] == true || $ini['Other']['dilbank.coinEnabled'] == true)
 {
 	echo '<a href="?do=',entScape($_GET['do']),'&action=buy">Buy</a>';
 }
 echo '<br>';
-if($_GET['action'] == 'buy' && $ini['Other']['dilbank.buyEnabled'] == true)
+if($_GET['action'] == 'buy' && ($ini['Other']['dilbank.coinEnabled'] == true || $ini['Other']['dilbank.dilEnabled'] == true))
 {
 	if(isset($_POST['buy']) && ($_POST['bType'] == 'coin' || $_POST['bType'] ==  'dil'))
 	{
@@ -22,30 +22,44 @@ if($_GET['action'] == 'buy' && $ini['Other']['dilbank.buyEnabled'] == true)
 			{
 				if($_POST['bType'] == 'coin')
 				{
-					$cost = $_POST['amount'] * $ini['Other']['dilbank.price'];
-					if($arrayQ['dil'] >= $cost)
+					if($ini['Other']['dilbank.coinEnabled'] == true)
 					{
-						msquery("UPDATE %s.dbo.userExt SET dil = dil - %s where user_no = '%s'", $ini['MSSQL']['extrasDB'], $cost, $_SESSION['user_no']);
-						msquery("UPDATE cash.dbo.user_cash SET amount = amount + %s where user_no = '%s'", $_POST['amount'], $_SESSION['user_no']);
-						echo 'You have successfully bought ',entScape($_POST['amount']),' coin(s).<br>';
+						$cost = $_POST['amount'] * $ini['Other']['dilbank.price'];
+						if($arrayQ['dil'] >= $cost)
+						{
+							msquery("UPDATE %s.dbo.userExt SET dil = dil - %s where user_no = '%s'", $ini['MSSQL']['extrasDB'], $cost, $_SESSION['user_no']);
+							msquery("UPDATE cash.dbo.user_cash SET amount = amount + %s where user_no = '%s'", $_POST['amount'], $_SESSION['user_no']);
+							echo 'You have successfully bought ',entScape($_POST['amount']),' coin(s).<br>';
+						}
+						else
+						{
+							echo 'You do not have enough dil to buy that many coins.<br>';
+						}
 					}
 					else
 					{
-						echo 'You do not have enough dil to buy that many coins.<br>';
+						echo 'Buying coins for dil is disabled.<br>';
 					}
 				}
 				else
 				{
-					if ($arrayQ['total'] >= $_POST['amount'])
+					if($ini['Other']['dilbank.dilEnabled'] == true)
 					{
-						$dil = $_POST['amount'] * $ini['Other']['dilbank.price'];
-						msquery("UPDATE %s.dbo.userExt SET dil = dil + %s where user_no = '%s'", $ini['MSSQL']['extrasDB'], $dil, $_SESSION['user_no']);
-						msquery("UPDATE cash.dbo.user_cash SET amount = amount - %s where user_no = '%s'", $_POST['amount'], $_SESSION['user_no']);
-						echo 'You have successfully bought ',entScape($dil),' dil.<br>';
+						if ($arrayQ['total'] >= $_POST['amount'])
+						{
+							$dil = $_POST['amount'] * $ini['Other']['dilbank.price'];
+							msquery("UPDATE %s.dbo.userExt SET dil = dil + %s where user_no = '%s'", $ini['MSSQL']['extrasDB'], $dil, $_SESSION['user_no']);
+							msquery("UPDATE cash.dbo.user_cash SET amount = amount - %s where user_no = '%s'", $_POST['amount'], $_SESSION['user_no']);
+							echo 'You have successfully bought ',entScape($dil),' dil.<br>';
+						}
+						else
+						{
+							echo 'You do not have enough coins to buy that much dil.<br>';
+						}
 					}
 					else
 					{
-						echo 'You do not have enough coins to buy that much dil.<br>';
+						echo 'Buying dil for coins is disabled.<br>';
 					}
 				}
 			}
@@ -59,9 +73,12 @@ if($_GET['action'] == 'buy' && $ini['Other']['dilbank.buyEnabled'] == true)
 	$bQuery = msquery("SELECT dil FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
 	$bFetch = mssql_fetch_array($bQuery);
 	echo 'Banked dil: <b>',$bFetch['dil'],'</b>
+	<br>Dil to coin ratio: <b>',entScape($ini['Other']['dilbank.price']),':1</b>
 	<form action="?do=',$_GET['do'],'&action=buy" method="POST">
-	<input type="text" name="amount" /> <select name="bType"><option value="dil">Dil(x',entScape($ini['Other']['dilbank.price']),')</option><option value="coin">Coins</option></select>
-	<br><input type="submit" name="buy" value="Buy" />
+	<input type="text" name="amount" /> <select name="bType">';
+	if($ini['Other']['dilbank.dilEnabled'] == true) echo '<option value="dil">Dil(x',entScape($ini['Other']['dilbank.price']),')</option>';
+	if($ini['Other']['dilbank.coinEnabled'] == true) echo '<option value="coin">Coins</option>';
+	echo '</select><br><input type="submit" name="buy" value="Buy" />
 	</form>';
 
 }

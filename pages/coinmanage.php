@@ -1,9 +1,8 @@
 <?php
-echo '<table><form action="?do=coinmanage" method="POST">
-	<tr><td>Character Name:<br><input type="text" name="charname"></td></tr>
-	<tr><td>Give Coins (+):<br><input type=text name="coinsP" value="0"></td></tr>
-	<tr><td>Take Coins (-):<br><input type=text name="coinsM" value="0"></td></tr>
-	<tr><td colspan="2"><input type=submit name="select" value="Update"></td></tr></form></table>';
+echo '<form action="?do=coinmanage" method="POST">Character Name:<input type="text" name="charname"><br>
+	Give Coins (+):<input type=text name="coinsP" value="0"><br>
+	Take Coins (-):<input type=text name="coinsM" value="0"><br>
+	<input type=submit name="select" value="Update"></form>';
  
 if(!empty($_POST['select']) && !empty($_POST['charname'])) 
 {

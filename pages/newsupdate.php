@@ -37,7 +37,7 @@ else
 		msquery("INSERT INTO %s.dbo.site_news (title,wroteby,wrotedate,content) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['title'], $_SESSION['webName'], $time, $_POST['content']);
 		echo 'News updated!';
 	}
-	echo '<table><tr><td><a href="?do=',entScape($_GET['do']),'&part=new">Add News</a></td></tr><tr><th>Title</th><th>Written By</th><th>Date</th></tr>';
+	echo '<a href="?do=',entScape($_GET['do']),'&part=new">Add News</a><table><tr><th>Title</th><th>Written By</th><th>Date</th></tr>';
 	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
 	while($r = mssql_fetch_array($query))
 	{

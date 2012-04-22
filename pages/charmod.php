@@ -1,6 +1,6 @@
 <?php
 
-echo '<form action="?do=',entScape($_GET['do']),'" method="POST"><input type="text" name="schar" /> <input type="submit" name="search" value="Search"/></form>';
+echo '<form action="?do=',entScape($_GET['do']),'" method="POST">Character: <input type="text" name="schar" /> <input type="submit" name="search" value="Search"/></form>';
 if((isset($_POST['search']) || (isset($_POST['update']) && !empty($_POST['oChar']))) && !empty($_POST['schar']))
 {
 	if(isset($_POST['update']))

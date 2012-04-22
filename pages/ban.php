@@ -86,7 +86,7 @@ if(mssql_num_rows($bQuery) > 0)
 		<td>',entScape($bFetch['wBy']),'</td>
 		<td><a href="?do=',entScape($_GET['do']),'&action=unban&aid=',entScape($bFetch['accountname']),'">Unban</a></td></tr>';
 	}
-	echo '</table><br>';
+	echo '</table>';
 }
 
 $bQuery = msquery("SELECT wDate, accountname, wBy FROM %s.dbo.banned where type = 'u' order by wDate desc", $ini['MSSQL']['extrasDB']);

@@ -69,9 +69,7 @@ elseif ($_GET['part'] == "edit")
 }
 else
 {
-	echo '<table>
-	<tr><td><a href="?do=',entScape($_GET['do']),'&part=new">Add Event</a></td></tr>
-	<tr><th>Event</th><th>Host</th><th>Start Date</th><th>End Date</th></tr>';
+	echo '<a href="?do=',entScape($_GET['do']),'&part=new">Add Event</a><table><tr><th>Event</th><th>Host</th><th>Start Date</th><th>End Date</th></tr>';
 	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB']);
 	while($eFetch = mssql_fetch_array($eQuery))
 	{
