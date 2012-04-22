@@ -18,6 +18,8 @@ if(isset($_POST['build']))
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'blist' and xtype = 'U') CREATE TABLE %s.dbo.blist (auctionID bigint PRIMARY KEY IDENTITY, aid varchar (50) collate Chinese_PRC_CI_AS, exp bigint, coins int default(0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create userExt table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20) collate Chinese_PRC_CI_AS, user_id varchar (20) collate Chinese_PRC_CI_AS, exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	// create rebirth table
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'rebirth' and xtype = 'U') CREATE TABLE %s.dbo.rebirth (character_no varchar (18) collate Chinese_PRC_CI_AS, rebirth int)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
 	while($iFetch = mssql_fetch_array($iQuery))
