@@ -9,7 +9,7 @@ if(mssql_num_rows($dQuery) > 0)
 		echo '
 		<tr><td>',entScape($dFetch['name']),'</td></tr>
 		<tr><td>Version: ',entScape($dFetch['version']),'</td></tr>
-		<tr><td>',entScape($dFetch['descr']),'</td></tr>
+		<tr><td>',nl2br(entScape($dFetch['descr'])),'</td></tr>
 		<tr><td><a href="',entScape($dFetch['link']),'" target="_blank">Download</a></td></tr>';
 	}
 }

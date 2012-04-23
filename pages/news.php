@@ -16,7 +16,7 @@ if ($count > 0)
 	while($r = mssql_fetch_array($query))
 	{
 		echo '<div id="section"><span id="heading">',entScape($r['title']),'</span>
-		<br>Written by <span id="wroteby">',entScape($r['wroteby']),'</span> at <span id="date">',entScape($r['wrotedate']),'</span><br><span id="news">'.entScape($r['content']).'</span></div>';
+		<br>Written by <span id="wroteby">',entScape($r['wroteby']),'</span> at <span id="date">',entScape($r['wrotedate']),'</span><br><span id="news">'.nl2br(entScape($r['content'])).'</span></div>';
 	}
 }	
 else
