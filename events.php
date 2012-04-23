@@ -32,7 +32,7 @@ if ($count > 0)
 		{
 		echo 'During <span id="time">',entScape($eFetch['eStart']),' - ',entScape($eFetch['eEnd']),'</span><br>';
 		}
-		echo'<span id="desc">',nl2br(entScape($eFetch['eDesc'])),'</span></div>';
+		echo'<span id="desc">',entScape($eFetch['eDesc'],true,true),'</span></div>';
 	}
 }	
 else

@@ -77,13 +77,23 @@ Function to convert html special characters.
 
 Parameters:
 	$str	String to be converted
+	$lbr	Boolean for line break recognition
+	$bb	Boolean for enabling allowed BB
 
 Return value:
 	string	The converted string
 */
-function entScape($str)
+function entScape($str, $lbr = false, $bb = false)
 {
-	return htmlentities($str, ENT_QUOTES | ENT_HTML401);
+	$str = htmlentities($str, ENT_QUOTES | ENT_HTML401);
+	if($lbr == true) $str = nl2br($str);
+	if($bb == true)
+	{
+		$search = array('/\[img=&quot;(.*?)&quot;\]/', '/\[style=&quot;(.*?)&quot;\](.*?)\[\/style\]/', '/\[url=&quot;(.*?)&quot;\](.*?)\[\/url\]/');
+		$replace = array('<img src="\\1" />', '<span style="\\1">\\2</span>', '<a href="\\1">\\2</a>');
+		$str = preg_replace($search, $replace, $str);
+	}
+	return $str;
 }
 
 /*
