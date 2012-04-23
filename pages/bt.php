@@ -7,7 +7,7 @@ if(isset($_POST['build']))
 	// create news table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_news' and xtype = 'U') CREATE TABLE %s.dbo.site_news (sid int PRIMARY KEY IDENTITY, title varchar (80) null, wroteby varchar (50), wrotedate varchar(50), content text null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create downloads table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_download' and xtype = 'U') CREATE TABLE %s.dbo.site_download (sid int PRIMARY KEY IDENTITY, link varchar (500) null, name varchar(60) null, version varchar(50) null, descr text (16))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'site_download' and xtype = 'U') CREATE TABLE %s.dbo.site_download (sid int PRIMARY KEY IDENTITY, link varchar (500) null, name varchar(60) null, version varchar(50) null, descr text null )", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create ban table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'banned' and xtype = 'U') CREATE TABLE %s.dbo.banned (wDate datetime null, accountname nvarchar (60) default('<none>'), reason varchar (50) default('no reason'), wBy varchar (50) default('<no one>'), type char (10))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create vote table
