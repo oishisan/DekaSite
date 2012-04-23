@@ -22,7 +22,9 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 				$cFetch = mssql_fetch_array($cQuery);
 				if($cFetch['rebirth'] == null || $cFetch['rebirth'] < $count)
 				{
-					$rArray = explode(',',$ini['Other']['rebirth'][0]);
+					$rCount = 0;
+					if($cFetch['rebirth'] != null) $rCount = $cFetch['rebirth'];
+					$rArray = explode(',',$ini['Other']['rebirth'][$rCount]);
 					if($cFetch['wLevel'] >= $rArray[0])
 					{
 						if($ccFetch['total'] != null && $ccFetch['total'] >= $rArray[2])
@@ -61,6 +63,14 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 							{
 								msquery("DELETE FROM character.dbo.user_slot WHERE character_no = '%s'", $cFetch['character_no']);
 								msquery("DELETE FROM character.dbo.user_skill WHERE character_no = '%s'", $cFetch['character_no']);
+							}
+							if(isset($ini['Other']['rebirth'.($rCount+1).'.send']))
+							{
+								foreach($ini['Other']['rebirth'.($rCount+1).'.send'] as $x)
+								{
+									$send = explode(',',$x);
+									msquery("EXEC character.dbo.SP_POST_SEND_OP '%s','Rebirth',1,'Rebirth bonus','Congratulations on your rebirth!','%s','%s',0",$cFetch['character_no'], $send[0], $send[1]);
+								}
 							}
 							echo 'Rebirth successful!<br>';
 						}

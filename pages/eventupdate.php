@@ -73,7 +73,7 @@ else
 	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB']);
 	while($eFetch = mssql_fetch_array($eQuery))
 	{
-		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&eid=',entScape($eFetch['eID']),'">',entScape($eFetch['eName']),'</a></td><td>',entScape($eFetch['eHost']),'</td><td>',entScape($eFetch['eStart']),'</td><td>',entScape($eFetch['eEnd']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=delete&eid=',entScape($eFetch['eID']),'">Delete</a></td></tr>';
+		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&eid=',entScape($eFetch['eID']),'">[',entScape($eFetch['eName']),']</a></td><td>',entScape($eFetch['eHost']),'</td><td>',entScape($eFetch['eStart']),'</td><td>',entScape($eFetch['eEnd']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=delete&eid=',entScape($eFetch['eID']),'">Delete</a></td></tr>';
 	}
 	echo '</table>';
 

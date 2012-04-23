@@ -41,7 +41,7 @@ else
 	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
 	while($r = mssql_fetch_array($query))
 	{
-		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($r['sid']),'">',entScape($r['title']),'</a></td><td>',entScape($r['wroteby']),'</td><td>',entScape($r['wrotedate']),'</td><td><a href="?do=newsupdate&type=delete&sid=',entScape($r['sid']),'">Delete</a></td></tr>';
+		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($r['sid']),'">[',entScape($r['title']),']</a></td><td>',entScape($r['wroteby']),'</td><td>',entScape($r['wrotedate']),'</td><td><a href="?do=newsupdate&type=delete&sid=',entScape($r['sid']),'">Delete</a></td></tr>';
 	}
 	echo '</table>';
 

@@ -44,7 +44,7 @@ else
 	$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
 	while($dFetch = mssql_fetch_array($dQuery))
 	{
-		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($dFetch['sid']),'">',entScape($dFetch['name']),'</a></td>
+		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($dFetch['sid']),'">[',entScape($dFetch['name']),']</a></td>
 		<td>',entScape($dFetch['version']),'</td>
 		<td><a href="?do=',entScape($_GET['do']),'&action=remove&sid=',entScape($dFetch['sid']),'">Remove</a></td></tr>';
 	}
