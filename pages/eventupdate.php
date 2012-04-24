@@ -9,17 +9,15 @@ if ($_GET['action'] == "edit")
 		$edate = date("n/j/o g:i A", $edate);
 		$date = date("n/j/o g:i A",strtotime($_POST['date']));
 		msquery("UPDATE %s.dbo.event SET eDesc = '%s',eName = '%s', eStart = '%s', eEnd = '%s' WHERE eid = '%s'", $ini['MSSQL']['extrasDB'], $_POST['content'], $_POST['title'], $sdate, $edate,$_POST['eid']);
-		echo 'Edit done!';
 	}
 	else
 	{
-		echo 'End date cannot be earlier than starting date!';
+		echo 'End date cannot be earlier than starting date!<br>';
 	}
 }
 if ($_GET['action'] == "delete")
 {	
 	msquery("DELETE FROM %s.dbo.event WHERE eid = '%s'",$ini['MSSQL']['extrasDB'], $_GET['eid']);
-	echo 'Delete done!';
 }
 if ($_GET['action'] == "create")
 {
@@ -30,11 +28,10 @@ if ($_GET['action'] == "create")
 		$sdate = date("n/j/o g:i A", $sdate);
 		$edate = date("n/j/o g:i A", $edate);
 		msquery("INSERT INTO %s.dbo.event(eName,eHost,eStart,eEnd,eDesc) VALUES ('%s','%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['title'], $_SESSION['webName'], $sdate, $edate, $_POST['content']);
-		echo 'Event added!';
 	}
 	else
 	{
-		echo 'End date cannot be earlier than starting date!';
+		echo 'End date cannot be earlier than starting date!<br>';
 	}
 }
 if ($_GET['part'] == "new")

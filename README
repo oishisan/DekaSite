@@ -52,6 +52,16 @@ Example: I want "Admin" to inherit "GM" pages so I make the setting called
 "i.Admin[] = GM". If i wanted to to inherit vip pages too, I just add a new 
 line "i.Admin[] = vip".
 
+BBCode
+------
+These BBCode tags that are supported:
+
+For images: [img="link"]
+For links: [url="url"]your text[/url]
+For css style: [style="CSS"]Your text[/style]
+
+Where CSS is you can use valid CSS to style your text.
+
 ------
 Issues
 ------

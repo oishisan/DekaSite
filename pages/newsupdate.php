@@ -24,18 +24,16 @@ else
 	if ($_GET['type'] == "edit")
 	{
 		msquery("UPDATE %s.dbo.site_news SET content = '%s',title = '%s' WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_POST['content'], $_POST['title'], $_POST['sid']);
-		echo 'Edit done!';
 	}
 	if ($_GET['type'] == "delete")
 	{	
 		msquery("DELETE FROM %s.dbo.site_news WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']);
-		echo 'Delete done!';
+		echo 'Deleted!<br>';
 	}
 	if ($_GET['type'] == "create")
 	{
 		$time = date("m/d/Y");
 		msquery("INSERT INTO %s.dbo.site_news (title,wroteby,wrotedate,content) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['title'], $_SESSION['webName'], $time, $_POST['content']);
-		echo 'News updated!';
 	}
 	echo '<a href="?do=',entScape($_GET['do']),'&part=new">Add News</a><table><tr><th>Title</th><th>Written By</th><th>Date</th></tr>';
 	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
