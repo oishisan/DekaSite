@@ -54,7 +54,8 @@ line "i.Admin[] = vip".
 
 BBCode
 ------
-These BBCode tags that are supported:
+The following BBCode tags are supported for the content of news and events.
+Also, the description of downloads supports them too.
 
 For images: [img="link"]
 For links: [url="url"]your text[/url]
