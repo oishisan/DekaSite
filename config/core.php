@@ -13,7 +13,6 @@ if(get_magic_quotes_runtime())
 // Set compression
 ini_set('zlib.output_compression', 'On');
 
-
 // Parse Config.ini
 $ini = parse_ini_file('config.ini', true);
 
@@ -161,17 +160,19 @@ function authPages(&$settings, &$allow)
 	}
 	else
 	{
-		if(array_key_exists('member', $settings['whitelist.top']))
+		$auth = 'member';
+		if($_SESSION['lTag'] == 'N') $auth = 'ban';
+		if(array_key_exists($auth, $settings['whitelist.top']))
 		{
-			foreach($settings['whitelist.top']['member'] as $val)
+			foreach($settings['whitelist.top'][$auth] as $val)
 			{
 				$allow['top'][splitWV($val,2)][0] = splitWV($val);
 				$allow['top'][splitWV($val,2)][1] = splitWV($val,1);
 			}
 		}
-		if(array_key_exists('member', $settings['whitelist.side']))
+		if(array_key_exists($auth, $settings['whitelist.side']))
 		{
-			foreach($settings['whitelist.side']['member'] as $val)
+			foreach($settings['whitelist.side'][$auth] as $val)
 			{
 				$allow['side'][splitWV($val,2)][0] = splitWV($val);
 				$allow['side'][splitWV($val,2)][1] = splitWV($val,1);
@@ -268,12 +269,12 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 'guest') || (isset($_SES
 {
 	if (isset($_POST['login']) && $_SESSION['auth'] == 'guest')
 	{
-		$accountInfo = msquery("SELECT user_no, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' AND user_pwd = '%s' AND login_tag = 'Y' GROUP BY user_no",$_POST['accname'],md5($_POST['accpass']));
+		$accountInfo = msquery("SELECT user_no, login_tag, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' AND user_pwd = '%s' GROUP BY user_no, login_tag",$_POST['accname'],md5($_POST['accpass']));
 		
 	}
 	else
 	{
-		$accountInfo = msquery("SELECT user_no, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' AND login_tag = 'Y' GROUP BY user_no",$_SESSION['accname']);
+		$accountInfo = msquery("SELECT user_no, login_tag, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' GROUP BY user_no, login_tag",$_SESSION['accname']);
 	}
 	if ($accountInfo)
 	{
@@ -285,6 +286,7 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 'guest') || (isset($_SES
 				$_SESSION['accname'] = $_POST['accname'];
 				sLog('Login success');
 			}
+			$_SESSION['lTag'] = $getAccount['login_tag'];
 			$_SESSION['user_no'] = $getAccount['user_no'];
 			if($ini['MSSQL']['extras'] == true)
 			{

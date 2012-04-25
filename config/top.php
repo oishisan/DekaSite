@@ -1,5 +1,5 @@
 <?php
-if(array_key_exists('top', $_SESSION['aSites']))
+if(isset($_SESSION['aSites']['top']) && array_key_exists('top', $_SESSION['aSites']))
 {
 	foreach ($_SESSION['aSites']['top'] as $key=>$val)
 	{
