@@ -22,7 +22,7 @@ if($_GET['action'] == 'new' && $cCount > 0)
 }
 elseif($_GET['action'] == 'view' && isset($_GET['id']))
 {
-$tQuery = msquery("select status, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rid desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);
+$tQuery = msquery("select status, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);
 $rCount = mssql_num_rows($tQuery);
 if($rCount > 0)
 {
@@ -58,7 +58,7 @@ if($rCount > 0)
 			}
 			if($tError == 0)
 			{
-				msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $_GET['id'], $rCount, $_SESSION['user_no'], $_POST['reply']);
+				msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['user_no'], $_POST['reply']);
 			}
 			else
 			{
@@ -66,7 +66,7 @@ if($rCount > 0)
 			}
 		}
 	}
-	$tQuery = msquery("select poster, owner, post, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rid asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);	
+	$tQuery = msquery("select poster, owner, post, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);	
 	while($tFetch = mssql_fetch_array($tQuery))
 	{
 		if($tFetch['poster'] == $_SESSION['user_no']) $tFetch['poster'] = 'you';

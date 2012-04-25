@@ -23,7 +23,7 @@ if(isset($_POST['build']))
 	// create tickets table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'tickets' and xtype = 'U') CREATE TABLE %s.dbo.tickets (tid varchar (50) PRIMARY KEY, type varchar (50), owner varchar (50) collate Chinese_PRC_CI_AS, title varchar (20), status int, topen datetime, lby varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create ticket_post table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'ticket_post' and xtype = 'U') CREATE TABLE %s.dbo.ticket_post (tid varchar (50), rid int, poster varchar (50) collate Chinese_PRC_CI_AS, post text null, rdate datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'ticket_post' and xtype = 'U') CREATE TABLE %s.dbo.ticket_post (tid varchar (50), poster varchar (50) collate Chinese_PRC_CI_AS, post text null, rdate datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
 	while($iFetch = mssql_fetch_array($iQuery))
