@@ -130,22 +130,22 @@ else
 			echo 'Invalid category.<br>';
 		}
 	}
-	$tQuery = msquery("select tid, title, type, status from %s.dbo.tickets where owner = '%s' order by status desc, topen desc", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-	echo '<table><tr><th>Title</th><th>Type</th><th>Status</th></tr>';
+	$tQuery = msquery("select t.tid, type, user_id, title, rdate, (case when poster = t.owner then 'You' else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and t.owner = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
 	if(mssql_num_rows($tQuery) > 0)
 	{
+		echo '<table><tr><th>Title</th><th>Type</th><th>Status</th><th>Last reply</th></tr>';
 		while ($tFetch = mssql_fetch_array($tQuery))
 		{
 			$status = 'Open';
 			if($tFetch['status'] == 0) $status = 'Closed';
 			if($tFetch['status'] == -1) $status = 'Locked';
-			echo '<tr><td><a href="?do=',entscape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['type']),'</td><td>',entScape($status),'</td></tr>';
+			echo '<tr><td><a href="?do=',entscape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['type']),'</td><td>',entScape($status),'</td><td>',entScape($tFetch['poster']),'<br>',entScape($tFetch['rdate']),'</td></tr>';
 		}
+		echo '</table>';
 	}
 	else
 	{
-		echo '<td colspan="3">You do not have any submitted tickets.</td>';
+		echo 'You do not have any submitted tickets.';
 	}
-	echo '</table>';
 }
 ?>

@@ -14,24 +14,52 @@ if(isset($_POST['status']) && (int)$_POST['status'] === 0) echo 'selected="selec
 echo'>Closed</option><option value="-1" ';
 if(isset($_POST['status']) && (int)$_POST['status'] === -1) echo 'selected="selected"';
 echo'>Locked</option></select><br>
+Order: <select name="order"><option value="0 "';
+if(isset($_POST['order']) && $_POST['order'] == 0) echo 'selected="selected"';
+echo '>Newest reply</option><option value="1" '; 
+if(isset($_POST['order']) && $_POST['order'] == 1) echo 'selected="selected"';
+echo'>Oldest Tickets</option><option value="2" ';
+if(isset($_POST['order']) && $_POST['order'] == 2) echo 'selected="selected"';
+echo '>Newest Tickets</option></select><br>
 <input type="submit" value="Search" name="search"/></form>';
-if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) && isset($_POST['status']))
+if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) && isset($_POST['status']) && isset($_POST['order']))
 {
-	$iStatus = 0;
-	$_POST['status'] = (int)$_POST['status'];
-	if($_POST['status'] !== 1 && $_POST['status'] !== -1 && $_POST['status'] !== 0)
+	if(in_array($_POST['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]))
 	{
-		$iStatus = 1;
-	}
-	if(in_array($_POST['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]) && $iStatus === 0)
-	{
-		$tQuery = msquery("select tid, user_id, title from %s.dbo.tickets join account.dbo.user_profile on account.dbo.user_profile.user_no = %s.dbo.tickets.owner where type = '%s' and status = '%s' order by topen asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_POST['type'], $_POST['status']);
+		$_POST['status'] = (int)$_POST['status'];
+		switch ($_POST['status'])
+		{
+			case -1:
+				break;
+			case 0:
+				break;
+			default:
+				$_POST['status'] = 1;
+
+		}
+		switch ($_POST['order'])
+		{
+			case 1:
+				$_POST['order'] = 'topen asc';
+				break;
+			case 2:
+				$_POST['order'] = 'topen desc';
+				break;
+			default:
+				$_POST['order'] = 'rdate desc';
+
+		}
+		$tQuery = msquery("select t.tid, user_id, title, lby, rdate, (case when poster = t.owner then user_id else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and type = '%s' and status = '%s' order by %s", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_POST['type'], $_POST['status'], $_POST['order']);
 		if (mssql_num_rows($tQuery) > 0)
 		{
-			echo '<table><tr><th>Ticket</th><th>Account</th>';
+			echo '<table><tr><th>By</th><th>Ticket</th><th>Last reply</th>';
+			if($_POST['status'] === -1) echo '<th>Locked by</th>';
+			echo '</tr>';
 			while($tFetch = mssql_fetch_array($tQuery))
 			{
-				echo '<tr><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['user_id']),'</td></tr>';
+				echo '<tr><td>',entScape($tFetch['user_id']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['poster']),'<br>',$tFetch['rdate'],'</td>';
+				if($_POST['status'] === -1) echo '<td>',entScape($tFetch['lby']),'</td>';
+				echo '</tr>';
 			}
 			echo '</table>';
 		}
@@ -39,10 +67,6 @@ if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) &
 		{	
 			echo 'No tickets available.';
 		}
-	}
-	elseif($iStatus !== 0)
-	{
-		echo 'Invalid status.';
 	}
 	else
 	{
@@ -74,7 +98,7 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 			}
 			if(isset($_POST['unlock']) && $tFetch['status'] == -1)
 			{
-				msquery("update %s.dbo.tickets set status = '0' where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id']);
+				msquery("update %s.dbo.tickets set status = '0', lby = NULL where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id']);
 				$tFetch['status'] = 0;
 			}
 			if(isset($_POST['rsub']) && isset($_POST['reply']) && !empty($_POST['reply']))
@@ -92,7 +116,7 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 					msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['webName'], $_POST['reply']);
 				}
 			}
-			$pQuery = msquery("select poster, owner, post, rdate, user_id from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid join account.dbo.user_profile on account.dbo.user_profile.user_no = %s.dbo.tickets.owner where %s.dbo.ticket_post.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'],$ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_GET['id']);	
+			$pQuery = msquery("select poster, owner, post, rdate, user_id from %s.dbo.ticket_post tp join %s.dbo.tickets t on t.tid = tp.tid join account.dbo.user_profile a on a.user_no = t.owner where tp.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_GET['id']);	
 			while($pFetch = mssql_fetch_array($pQuery))
 			{
 				if($pFetch['poster'] == $_SESSION['webName']) $pFetch['poster'] = 'you';

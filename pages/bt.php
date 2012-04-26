@@ -38,12 +38,6 @@ if(isset($_POST['build']))
 		msquery("INSERT INTO %s.dbo.auth values ('%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_POST['authID'], $_POST['auth'], $_POST['authN']);
 		echo 'Authorization initialized.<br>It is suggested that you move the Build Tables page to Administrators only level.<br>';
 	}
-	if(isset($_POST['p15']) && $_POST['p15'] == true)
-	{
-		msquery("ALTER TABLE %s.dbo.auth ALTER COLUMN auth varchar (20) NOT NULL", $ini['MSSQL']['extrasDB']);
-		msquery("UPDATE %s.dbo.auth SET auth = 'Admin' WHERE auth = '3'; UPDATE %s.dbo.auth SET auth = 'GM' where auth = '2'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
-		echo 'Patch 1.5 applied.<br>';
-	}
 	echo 'You may enable extras features.';
 }
 else
@@ -56,10 +50,6 @@ else
 		{
 			echo 'Your authorization tables haven\'t been built. Please enter an account ID to be designated as the inital administrator.
 			<br>User ID: <input type="text" name="authID" /><br>Authority: <input type="text" name="auth" value="Admin" /><br>Web name: <input type="text" name="authN" /><br>';
-		}
-		else
-		{
-			echo'<br><input type="checkbox" name="p15" /> Apply patch 1.5 (only needed if upgrading from pre-v1.5)<br>';
 		}
 		echo'<input type="submit" name="build" value="Build Tables" /></form>';
 	}
