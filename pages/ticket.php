@@ -6,6 +6,7 @@ CSS page specific IDs
 #rName		The name of replier when viewing the ticket
 #rDate		The text of the date when viewing the ticket
 */
+requreExtras();
 $auth = $_SESSION['auth'];
 if($_SESSION['lTag'] == 'N') $auth = 'ban';
 
