@@ -59,9 +59,6 @@ Also, the description of downloads supports them too.
 
 For images: [img="link"]
 For links: [url="url"]your text[/url]
-For css style: [style="CSS"]Your text[/style]
-
-Where CSS is you can use valid CSS to style your text.
 
 ------
 Issues

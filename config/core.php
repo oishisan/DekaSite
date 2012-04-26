@@ -88,8 +88,8 @@ function entScape($str, $lbr = false, $bb = false)
 	if($lbr == true) $str = nl2br($str);
 	if($bb == true)
 	{
-		$search = array('/\[img=&quot;(.*?)&quot;\]/', '/\[style=&quot;(.*?)&quot;\](.*?)\[\/style\]/', '/\[url=&quot;(.*?)&quot;\](.*?)\[\/url\]/');
-		$replace = array('<img src="\\1" />', '<span style="\\1">\\2</span>', '<a href="\\1">\\2</a>');
+		$search = array('/\[img=&quot;(.*?)&quot;\]/', '/\[url=&quot;(.*?)&quot;\](.*?)\[\/url\]/');
+		$replace = array('<img src="\\1" />', '<a href="\\1">\\2</a>');
 		$str = preg_replace($search, $replace, $str);
 	}
 	return $str;
