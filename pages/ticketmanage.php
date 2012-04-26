@@ -29,6 +29,20 @@ echo'>Oldest Tickets</option><option value="2" ';
 if(isset($_POST['order']) && $_POST['order'] == 2) echo 'selected="selected"';
 echo '>Newest Tickets</option></select><br>
 <input type="submit" value="Search" name="search"/></form>';
+if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
+{
+	$dQuery = msquery("select type, count(type) as num from %s.dbo.tickets where tid = '%s' group by type", $ini['MSSQL']['extrasDB'], $_GET['id']);
+	$dFetch = mssql_fetch_array($dQuery);
+	if($dFetch['num'] == 1 && isset($ini['Other']['ticket.manage.'.$_SESSION['auth']]) && isset($ini['Other']['ticket.delete']) && in_array($dFetch['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]) && in_array($_SESSION['auth'], $ini['Other']['ticket.delete']))
+	{
+		msquery("DELETE FROM %s.dbo.tickets where tid = '%s'; DELETE FROM %s.dbo.ticket_post where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id'], $ini['MSSQL']['extrasDB'], $_GET['id']);
+		echo 'Ticket deleted.';
+	}
+	else
+	{
+		echo 'Invalid ticket.';
+	}
+}
 if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) && isset($_POST['status']) && isset($_POST['order']))
 {
 	if(in_array($_POST['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]))
@@ -66,6 +80,7 @@ if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) &
 			{
 				echo '<tr><td>',entScape($tFetch['user_id']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['poster']),'<br>',$tFetch['rdate'],'</td>';
 				if($_POST['status'] === -1) echo '<td>',entScape($tFetch['lby']),'</td>';
+				if(isset($ini['Other']['ticket.delete']) && in_array($_SESSION['auth'], $ini['Other']['ticket.delete'])) echo '<td><a href="?do=',entScape($_GET['do']),'&action=delete&id=',entScape($tFetch['tid']),'">Delete</a></td>';
 				echo '</tr>';
 			}
 			echo '</table>';

@@ -1,11 +1,10 @@
 <?php
-echo '<table><form action="?do=',entScape($_GET['do']),'&action=ban" method="POST">
-<tr><td><select name="type"><option value="account" selected>Account Name</option>
-<option value="charname">Character Name</option></select>
-<input type="text" name="dataname"></td></tr>
-<tr><td>Reason:<br><input type="text" name="reason"></td></tr>
-<tr><td colspan="2"><input type="submit" name="select" value="Ban Account" /></td></tr>
-</form></table>';
+echo '<div><form action="?do=',entScape($_GET['do']),'&action=ban" method="POST">
+<select name="type"><option value="account">Account Name</option>
+<option value="charname">Character Name</option></select><input type="text" name="dataname"><br>
+Reason: <input type="text" name="reason"><br>
+<input type="submit" name="select" value="Ban Account" />
+</form></div>';
 
 if($_GET['action'] == 'ban' && !empty($_POST['dataname'])) 
 {
@@ -71,39 +70,68 @@ if($_GET['action'] == 'unban' && !empty($_GET['aid']))
 	} 	
 }
 
-
-$bQuery = msquery("SELECT wDate, accountname, reason, wBy FROM %s.dbo.banned where type = 'b' order by wDate desc", $ini['MSSQL']['extrasDB']);
-if(mssql_num_rows($bQuery) > 0)
+echo 'If no end time is given, it will use the current time.
+<form action="?do=',entScape($_GET['do']),'" method="POST">
+Start time: <input type="text" name="stime" /><br>
+End time: <input type="text" name="etime" /><br>
+<select name="lType"><option value="b">Bans</option><option value="u">Unbans</option></select><br>
+<input type="submit" name="search" value="Search">
+</form>';
+if(!empty($_POST['stime']) && isset($_POST['search']))
 {
-	echo '<table>
-	<tr><th colspan="5">Current bans</th></tr>
-	<tr><th>Date</th><th>Account</th><th>Reason</th><th>Issued by</th>';
-	while($bFetch = mssql_fetch_array($bQuery)) 
+	if(empty($_POST['etime'])) 
 	{
-		echo '<tr><td>',entScape($bFetch['wDate']),'</td>
-		<td>',entScape($bFetch['accountname']),'</td>
-		<td>',entScape($bFetch['reason']),'</td>
-		<td>',entScape($bFetch['wBy']),'</td>
-		<td><a href="?do=',entScape($_GET['do']),'&action=unban&aid=',entScape($bFetch['accountname']),'">Unban</a></td></tr>';
+		$_POST['etime'] = date('M j Y g:iA');
 	}
-	echo '</table>';
-}
-
-$bQuery = msquery("SELECT wDate, accountname, wBy FROM %s.dbo.banned where type = 'u' order by wDate desc", $ini['MSSQL']['extrasDB']);
-if(mssql_num_rows($bQuery) > 0)
-{
-	echo '<table>
-	<tr><th colspan="4">Unban Log</th></tr>
-	<th>Date</th>
-	<th>Account</th>
-	<th>Issued by</th></tr>';
-	while($bFetch = mssql_fetch_array($bQuery)) 
+	else
 	{
-		echo '<tr>
-		<td>',entScape($bFetch['wDate']),'</td>
-		<td>',entScape($bFetch['accountname']),'</td>
-		<td>',entScape($bFetch['wBy']),'</td></tr>';
-	}	
-	echo '</table>';
+		$_POST['etime'] = date('M j Y g:iA',strtotime($_POST['etime']));
+	}
+	$_POST['stime'] = date('M j Y g:iA',strtotime($_POST['stime']));
+	if(isset($_POST['lType']) && $_POST['lType'] == 'b')
+	{
+		$bQuery = msquery("SELECT wDate, accountname, reason, wBy FROM %s.dbo.banned where type = 'b' and wDate >= convert(datetime,'%s') and wDate <= convert(datetime,'%s') order by wDate desc", $ini['MSSQL']['extrasDB'], $_POST['stime'], $_POST['etime']);
+		if(mssql_num_rows($bQuery) > 0)
+		{
+			echo 'Current bans<br>
+			',entScape($_POST['stime']),' - ',entScape($_POST['etime']),'
+			<table><tr><th>Date</th><th>Account</th><th>Reason</th><th>Issued by</th>';
+			while($bFetch = mssql_fetch_array($bQuery)) 
+			{
+				echo '<tr><td>',entScape($bFetch['wDate']),'</td>
+				<td>',entScape($bFetch['accountname']),'</td>
+				<td>',entScape($bFetch['reason']),'</td>
+				<td>',entScape($bFetch['wBy']),'</td>
+				<td><a href="?do=',entScape($_GET['do']),'&action=unban&aid=',entScape($bFetch['accountname']),'">Unban</a></td></tr>';
+			}
+			echo '</table>';
+		}
+		else
+		{
+			echo 'No logs were found for the specified time period.';
+		}
+	}
+	else
+	{
+		$bQuery = msquery("SELECT wDate, accountname, wBy FROM %s.dbo.banned where type = 'u' and wDate >= convert(datetime,'%s') and wDate <= convert(datetime,'%s') order by wDate desc", $ini['MSSQL']['extrasDB'], $_POST['stime'], $_POST['etime']);
+		if(mssql_num_rows($bQuery) > 0)
+		{
+			echo 'Unban Log<br>
+			',entScape($_POST['stime']),' - ',entScape($_POST['etime']),'
+			<table><th>Date</th><th>Account</th><th>Issued by</th></tr>';
+			while($bFetch = mssql_fetch_array($bQuery)) 
+			{
+				echo '<tr>
+				<td>',entScape($bFetch['wDate']),'</td>
+				<td>',entScape($bFetch['accountname']),'</td>
+				<td>',entScape($bFetch['wBy']),'</td></tr>';
+			}	
+			echo '</table>';
+		}
+		else
+		{
+			echo 'No logs were found for the specified time period.';
+		}
+	}
 }
 ?>

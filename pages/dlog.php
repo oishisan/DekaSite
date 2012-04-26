@@ -17,17 +17,20 @@ if(!empty($_POST['stime']) && isset($_POST['search']))
 	$_POST['stime'] = date('M j Y g:iA',strtotime($_POST['stime']));
 	echo entScape($_POST['stime']),' - ',entScape($_POST['etime']);
 	$dQuery = msquery("SELECT character_name,product,intime FROM cash.dbo.user_use_log where intime >= convert(datetime, '%s') and intime <= convert(datetime, '%s') ORDER BY intime DESC", $_POST['stime'], $_POST['etime']);
-	echo '<table><tr><th>Character Name</th><th>Item Name</th><th>Date</th></tr>';
-	while($dFetch = mssql_fetch_array($dQuery))
+	if(mssql_num_rows($dQuery) > 0)
 	{
-		echo '<tr><td>',entScape($dFetch['character_name']),'</td>';
-		echo '<td>',entScape($dFetch['product']),'</td>';	
-		echo '<td>',entScape($dFetch['intime']),'</td></tr>';
+		echo '<table><tr><th>Character Name</th><th>Item Name</th><th>Date</th></tr>';
+		while($dFetch = mssql_fetch_array($dQuery))
+		{
+			echo '<tr><td>',entScape($dFetch['character_name']),'</td>';
+			echo '<td>',entScape($dFetch['product']),'</td>';	
+			echo '<td>',entScape($dFetch['intime']),'</td></tr>';
+		}
+			echo "</table>";
 	}
-		echo "</table>";
-}
-else
-{
-	echo 'Please enter a starting time.';
+	else
+	{
+		echo 'No logs were found for the specified time period.';
+	}
 }
 ?>
