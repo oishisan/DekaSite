@@ -2,7 +2,9 @@
 /*
 CSS page specific IDs
 ---------------------
-#tpost	Each reply in when viewing a ticket
+#tpost		Each reply in when viewing a ticket
+#rName		The name of replier when viewing the ticket
+#rDate		The text of the date when viewing the ticket
 */
 $auth = $_SESSION['auth'];
 if($_SESSION['lTag'] == 'N') $auth = 'ban';
@@ -69,8 +71,8 @@ if($rCount > 0)
 	$tQuery = msquery("select poster, owner, post, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);	
 	while($tFetch = mssql_fetch_array($tQuery))
 	{
-		if($tFetch['poster'] == $_SESSION['user_no']) $tFetch['poster'] = 'you';
-		echo '<div id="tpost">Written by ',entScape($tFetch['poster']),'<br>At ',entScape($tFetch['rdate']),'<br>',entScape($tFetch['post'],true),'</div>';
+		if($tFetch['poster'] == $_SESSION['user_no']) $tFetch['poster'] = 'You';
+		echo '<div id="tpost"><span id="rName">',entScape($tFetch['poster']),'</span><br><span id="rDate">',entScape($tFetch['rdate']),'</span><br>',entScape($tFetch['post'],true),'</div>';
 	}
 	if($stFetch['status'] == 1)
 	{
@@ -130,7 +132,7 @@ else
 			echo 'Invalid category.<br>';
 		}
 	}
-	$tQuery = msquery("select t.tid, type, user_id, title, rdate, (case when poster = t.owner then 'You' else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and t.owner = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
+	$tQuery = msquery("select t.tid, type, user_id, status, title, rdate, (case when poster = t.owner then 'You' else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and t.owner = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
 	if(mssql_num_rows($tQuery) > 0)
 	{
 		echo '<table><tr><th>Title</th><th>Type</th><th>Status</th><th>Last reply</th></tr>';

@@ -1,4 +1,11 @@
 <?php
+/*
+CSS page specific IDs
+---------------------
+#tpost		Each reply in when viewing a ticket
+#rName		The name of replier when viewing the ticket
+#rDate		The text of the date when viewing the ticket
+*/
 echo '<form action="?do=',entScape($_GET['do']),'" method="POST">Category: <select name="type">';
 foreach($ini['Other']['ticket.manage.'.$_SESSION['auth']] as $ttype)
 {
@@ -121,7 +128,7 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 			{
 				if($pFetch['poster'] == $_SESSION['webName']) $pFetch['poster'] = 'you';
 				if($pFetch['poster'] == $pFetch['owner']) $pFetch['poster'] = $pFetch['user_id'];
-				echo '<div id="tpost">Written by ',entScape($pFetch['poster']),'<br>At ',entScape($pFetch['rdate']),'<br>',entScape($pFetch['post'],true),'</div>';
+				echo '<div id="tpost"><span id="rName">',entScape($pFetch['poster']),'</span><br><span id="rDate">',entScape($pFetch['rdate']),'</span><br>',entScape($pFetch['post'],true),'</div>';
 			}
 			echo '<form action="?do=',entScape($_GET['do']),'&action=view&id=',entScape($_GET['id']),'" method="POST">';
 			if($tFetch['status'] == 1)

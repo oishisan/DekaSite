@@ -8,12 +8,15 @@ CSS index specific IDs
 #ptitle		Displayed page title
 */
 
+#mContain
+{
+text-align:center;
+}
+
 #content
 {
-float: left;
+float: right;
 width:80%;
-padding-left:10px;
-text-align:center;
 }
 
 #content table
@@ -47,6 +50,7 @@ color:black;
 #side
 {
 width:20%;
+float:left
 }
 
 #side #currentp
