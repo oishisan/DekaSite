@@ -60,7 +60,7 @@ if(count($stFetch) > 0)
 			}
 			if($tError == 0)
 			{
-				msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['user_no'], $_POST['reply']);
+				msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['user_no'], $_POST['reply'], date('n/j/Y g:i:s A'));
 			}
 			else
 			{
@@ -113,8 +113,8 @@ else
 				if($tError == 0)
 				{
 					$tid = uniqid(substr(session_id(),0,7));
-					msquery("INSERT INTO %s.dbo.tickets (tid, type, owner, title, status, topen) values ('%s','%s', '%s','%s', '1', getdate())", $ini['MSSQL']['extrasDB'], $tid,$ini['Other']['ticket.type.'.$auth][$_POST['cat']], $_SESSION['user_no'], $_POST['title']);
-					msquery("INSERT INTO %s.dbo.ticket_post (tid, poster, post, rdate) values ('%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $tid, $_SESSION['user_no'], $_POST['details']);
+					msquery("INSERT INTO %s.dbo.tickets (tid, type, owner, title, status, topen) values ('%s','%s', '%s','%s', '1', '%s')", $ini['MSSQL']['extrasDB'], $tid,$ini['Other']['ticket.type.'.$auth][$_POST['cat']], $_SESSION['user_no'], $_POST['title'], date('n/j/Y g:i:s A'));
+					msquery("INSERT INTO %s.dbo.ticket_post (tid, poster, post, rdate) values ('%s', '%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $tid, $_SESSION['user_no'], $_POST['details'], date('n/j/Y g:i:s A'));
 					echo 'Ticket submitted.<br>';
 				}
 				else

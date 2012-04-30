@@ -54,7 +54,7 @@ function msquery()
 		}
 		catch (PDOException $err)
 		{
-			echo 'Database connection failed.<br>',$err;
+			echo 'Database connection failed.';
 			exit(0);
 		}
 
@@ -271,7 +271,7 @@ function sLog($action, $sAcct = NULL)
 	if($GLOBALS['ini']['MSSQL']['extras'] == true)
 	{
 		if($sAcct == NULL) $sAcct = $_SESSION['accname'];
-		msquery("INSERT INTO %s.dbo.sessionlog values (getdate(),'%s', '%s', '%s')",$GLOBALS['ini']['MSSQL']['extrasDB'],$sAcct,$_SERVER['REMOTE_ADDR'], $action);
+		msquery("INSERT INTO %s.dbo.sessionlog values ('%s','%s', '%s', '%s')", $GLOBALS['ini']['MSSQL']['extrasDB'], date('n/j/Y g:i:s A'), $sAcct, $_SERVER['REMOTE_ADDR'], $action);
 	}
 }
 

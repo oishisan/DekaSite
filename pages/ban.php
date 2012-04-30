@@ -24,7 +24,7 @@ if($_GET['action'] == 'ban' && !empty($_POST['dataname']))
 	{
 		if (empty($_POST['reason'])) $_POST['reason'] = 'no reason';
 		msquery("UPDATE account.dbo.USER_PROFILE SET login_tag = 'N' WHERE user_id = '%s'", $accountname);
-		msquery("INSERT INTO %s.dbo.banned (wDate, accountname, reason, wBy, type) VALUES (getdate(), '%s', '%s', '%s', 'b')", $ini['MSSQL']['extrasDB'], $accountname, $_POST['reason'], $_SESSION['webName']);
+		msquery("INSERT INTO %s.dbo.banned (wDate, accountname, reason, wBy, type) VALUES ('%s', '%s', '%s', '%s', 'b')", $ini['MSSQL']['extrasDB'], date('n/j/Y g:i:s A'), $accountname, $_POST['reason'], $_SESSION['webName']);
 		echo 'The account "',entScape($accountname),'" was banned.<br>';
 		$dQuery = msquery("select top 1 Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP, count(account.dbo.user_connlog_key.user_no) as num from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s' and account.dbo.user_profile.login_flag <> '0' group by account.dbo.user_connlog_key.login_time,conn_ip order by account.dbo.user_connlog_key.login_time desc", $accountname);
 		$dFetch = $dQuery->fetch();
@@ -56,7 +56,7 @@ if($_GET['action'] == 'unban' && !empty($_GET['aid']))
 	{
 		msquery("UPDATE account.dbo.USER_PROFILE SET login_tag = 'Y' WHERE user_id = '%s'", $_GET['aid']);
 		msquery("DELETE FROM %s.dbo.banned WHERE accountname = '%s' and type = 'b'", $ini['MSSQL']['extrasDB'], $_GET['aid']);
-		msquery("INSERT INTO %s.dbo.banned (wDate, accountname, wBy, type) VALUES (getdate(), '%s','%s', 'u')", $ini['MSSQL']['extrasDB'], $_GET['aid'] , $_SESSION['webName']);
+		msquery("INSERT INTO %s.dbo.banned (wDate, accountname, wBy, type) VALUES ('%s', '%s','%s', 'u')", $ini['MSSQL']['extrasDB'], date('n/j/Y g:i:s A'), $_GET['aid'] , $_SESSION['webName']);
 		echo 'The account "',entScape($_GET['aid']),'" was unbanned.';
 
 	}

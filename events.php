@@ -13,7 +13,7 @@ CSS page specific IDs
 ob_start();
 include 'config\core.php';
 requireExtras();
-$eQuery = msquery("SELECT * FROM %s.dbo.event where eEnd>getdate() ORDER by eStart ASC", $ini['MSSQL']['extrasDB']);
+$eQuery = msquery("SELECT * FROM %s.dbo.event where eEnd>'%s' ORDER by eStart ASC", $ini['MSSQL']['extrasDB'], date('n/j/Y g:i:s A'));
 echo '<html><title>',entScape($ini['Other']['site.title']),' Events</title><head><style type="text/css">';
         include $ini['Other']['site.css'];
 echo '</style></head><body><div id="cTime">Current time: ',entScape(date("M j o g:i A")),'</div>';

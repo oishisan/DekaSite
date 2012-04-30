@@ -22,7 +22,7 @@ if($vCount > 0)
 			switch($cFetch['num'])
 			{
 				case 0:
-					msquery("INSERT INTO %s.dbo.vote VALUES ('%s','%s','%s',getdate())", $ini['MSSQL']['extrasDB'], $vInfo[2], $_SESSION['accname'], $_SERVER['REMOTE_ADDR']);
+					msquery("INSERT INTO %s.dbo.vote VALUES ('%s','%s','%s', '%s')", $ini['MSSQL']['extrasDB'], $vInfo[2], $_SESSION['accname'], $_SERVER['REMOTE_ADDR'], date('n/j/Y g:i:s A'));
 					msquery("UPDATE cash.dbo.user_cash SET amount = amount + '%s' WHERE user_no = '%s'", $vInfo[0], $_SESSION['user_no']);
 					header('Location: '.$vInfo[2]);
 					break;
@@ -30,7 +30,7 @@ if($vCount > 0)
 					$timeleft = strtotime($cFetch['wDate']." +".$vInfo[1]." seconds");
 					if ($timeleft <= strtotime(date("Y-m-d G:i")))
 					{
-						msquery("INSERT INTO %s.dbo.vote VALUES ('%s','%s','%s',getdate())", $ini['MSSQL']['extrasDB'], $vInfo[2], $_SESSION['accname'], $_SERVER['REMOTE_ADDR']);
+						msquery("INSERT INTO %s.dbo.vote VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $vInfo[2], $_SESSION['accname'], $_SERVER['REMOTE_ADDR'], date('n/j/Y g:i:s A'));
 						msquery("UPDATE cash.dbo.user_cash SET amount = amount + '%s' WHERE user_no = '%s'", $vInfo[0], $_SESSION['user_no']);
 						header('Location: '.$vInfo[2]);
 

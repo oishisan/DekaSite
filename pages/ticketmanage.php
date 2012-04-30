@@ -136,7 +136,7 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 				}
 				else
 				{
-					msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', getdate())", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['webName'], $_POST['reply']);
+					msquery("INSERT into %s.dbo.ticket_post values ('%s', '%s', '%s', '%s')", $ini['MSSQL']['extrasDB'], $_GET['id'], $_SESSION['webName'], $_POST['reply'], date('n/j/Y g:i:s A'));
 				}
 			}
 			$pQuery = msquery("select poster, owner, post, rdate, user_id from %s.dbo.ticket_post tp join %s.dbo.tickets t on t.tid = tp.tid join account.dbo.user_profile a on a.user_no = t.owner where tp.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_GET['id']);	
