@@ -6,7 +6,7 @@ foreach($query as $fetch)
 {
 	$query2 = msquery("SELECT max(login_time) as ltime from account.dbo.user_connlog_key where Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $fetch['IP']);
 	$fetch2 = $query2->fetch();
-	echo '<tr><td>',entScape($fetch['IP']),'</td><td>',entScape($fetch2['ltime']),'</td></td>';
+	echo '<tr><td>',entScape($fetch['IP']),'</td><td>',entScape(date('M j o g:i A',strtotime($fetch2['ltime']))),'</td></td>';
 }
 echo '</table>';
 
@@ -16,7 +16,7 @@ foreach ($query as $fetch)
 {
 	$query2 = msquery("SELECT max(wTime) as wTime from %s.dbo.sessionlog where IP = '%s' and wAction = 'Login Success'", $ini['MSSQL']['extrasDB'], $fetch['IP']);
 	$fetch2 = $query2->fetch();
-	echo '<tr><td>',entScape($fetch['IP']),'</td><td>',entScape($fetch2['wTime']),'</td></tr>';
+	echo '<tr><td>',entScape($fetch['IP']),'</td><td>',entScape(date('M j o g:i A', strtotime($fetch2['wTime']))),'</td></tr>';
 }
 echo '</table>';
 ?>

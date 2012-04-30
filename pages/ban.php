@@ -99,7 +99,7 @@ if(!empty($_POST['stime']) && isset($_POST['search']))
 			<table><tr><th>Date</th><th>Account</th><th>Reason</th><th>Issued by</th>';
 			foreach ($bQuery as $bFetch) 
 			{
-				echo '<tr><td>',entScape($bFetch['wDate']),'</td>
+				echo '<tr><td>',entScape(date('M j Y g:i A',strtotime($bFetch['wDate']))),'</td>
 				<td>',entScape($bFetch['accountname']),'</td>
 				<td>',entScape($bFetch['reason']),'</td>
 				<td>',entScape($bFetch['wBy']),'</td>
@@ -124,7 +124,7 @@ if(!empty($_POST['stime']) && isset($_POST['search']))
 			foreach ($bQuery as $bFetch) 
 			{
 				echo '<tr>
-				<td>',entScape($bFetch['wDate']),'</td>
+				<td>',entScape(date('M j Y g:i A',strtotime($bFetch['wDate']))),'</td>
 				<td>',entScape($bFetch['accountname']),'</td>
 				<td>',entScape($bFetch['wBy']),'</td></tr>';
 			}	

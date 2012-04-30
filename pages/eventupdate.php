@@ -52,8 +52,8 @@ elseif ($_GET['part'] == "edit")
 		echo '<form method="POST" action="?do=',entScape($_GET['do']),'&action=edit">
 		<tr><td><input type="hidden" name="eid" value="',entScape($eQuery[0]['eID']),'" />Name:<br>
 		<input type="text" name="title" value="',entScape($eQuery[0]['eName']),'" /></td></tr>
-		<tr><td>Start Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="sdate" value="',entScape($eQuery[0]['eStart']),'" /></td></tr>
-		<tr><td>End Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="edate" value="',entScape($eQuery[0]['eEnd']),'" /></td></tr>
+		<tr><td>Start Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="sdate" value="',entScape(date('M j Y g:i A',strtotime($eQuery[0]['eStart']))),'" /></td></tr>
+		<tr><td>End Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="edate" value="',entScape(date('M j Y g:i A',strtotime($eQuery[0]['eEnd']))),'" /></td></tr>
 		<tr><td>Description:<br><textarea name="content">',entScape($eQuery[0]['eDesc']),'</textarea></td></tr>
 		<tr><td><input type="submit" value="Edit" /></td></tr></form>';
 	}
@@ -69,7 +69,7 @@ else
 	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB'])->fetchAll();
 	foreach($eQuery as $eFetch)
 	{
-		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&eid=',entScape($eFetch['eID']),'">[',entScape($eFetch['eName']),']</a></td><td>',entScape($eFetch['eHost']),'</td><td>',entScape($eFetch['eStart']),'</td><td>',entScape($eFetch['eEnd']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=delete&eid=',entScape($eFetch['eID']),'">Delete</a></td></tr>';
+		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&eid=',entScape($eFetch['eID']),'">[',entScape($eFetch['eName']),']</a></td><td>',entScape($eFetch['eHost']),'</td><td>',entScape(date('M j Y g:i A',strtotime($eFetch['eStart']))),'</td><td>',entScape(date('M j Y g:i A',strtotime($eFetch['eEnd']))),'</td><td><a href="?do=',entScape($_GET['do']),'&action=delete&eid=',entScape($eFetch['eID']),'">Delete</a></td></tr>';
 	}
 	echo '</table>';
 

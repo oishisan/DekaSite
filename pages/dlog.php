@@ -8,13 +8,13 @@ if(!empty($_POST['stime']) && isset($_POST['search']))
 {
 	if(empty($_POST['etime'])) 
 	{
-		$_POST['etime'] = date('M j Y g:iA');
+		$_POST['etime'] = date('M j Y g:i A');
 	}
 	else
 	{
-		$_POST['etime'] = date('M j Y g:iA',strtotime($_POST['etime']));
+		$_POST['etime'] = date('M j Y g:i A',strtotime($_POST['etime']));
 	}
-	$_POST['stime'] = date('M j Y g:iA',strtotime($_POST['stime']));
+	$_POST['stime'] = date('M j Y g:i A',strtotime($_POST['stime']));
 	echo entScape($_POST['stime']),' - ',entScape($_POST['etime']);
 	$dQuery = msquery("SELECT character_name,product,intime FROM cash.dbo.user_use_log where intime >= convert(datetime, '%s') and intime <= convert(datetime, '%s') ORDER BY intime DESC", $_POST['stime'], $_POST['etime'])->fetchAll();
 	if(count($dQuery) > 0)
@@ -24,7 +24,7 @@ if(!empty($_POST['stime']) && isset($_POST['search']))
 		{
 			echo '<tr><td>',entScape($dFetch['character_name']),'</td>';
 			echo '<td>',entScape($dFetch['product']),'</td>';	
-			echo '<td>',entScape($dFetch['intime']),'</td></tr>';
+			echo '<td>',entScape(date('M j Y g:i A',strtotime($dFetch['intime']))),'</td></tr>';
 		}
 			echo "</table>";
 	}
