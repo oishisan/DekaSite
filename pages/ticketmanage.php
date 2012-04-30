@@ -79,7 +79,7 @@ if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) &
 			echo '</tr>';
 			foreach($tQuery as $tFetch)
 			{
-				echo '<tr><td>',entScape($tFetch['user_id']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['poster']),'<br>',$tFetch['rdate'],'</td>';
+				echo '<tr><td>',entScape($tFetch['user_id']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['poster']),'<br>',entScape(date('M j o g:i A',strtotime($tFetch['rdate']))),'</td>';
 				if($_POST['status'] === -1) echo '<td>',entScape($tFetch['lby']),'</td>';
 				if(isset($ini['Other']['ticket.delete']) && in_array($_SESSION['auth'], $ini['Other']['ticket.delete'])) echo '<td><a href="?do=',entScape($_GET['do']),'&action=delete&id=',entScape($tFetch['tid']),'">Delete</a></td>';
 				echo '</tr>';
@@ -145,7 +145,7 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 			{
 				if($pFetch['poster'] == $_SESSION['webName']) $pFetch['poster'] = 'You';
 				if($pFetch['poster'] == $pFetch['owner']) $pFetch['poster'] = $pFetch['user_id'];
-				echo '<div id="tpost"><span id="rName">',entScape($pFetch['poster']),'</span><br><span id="rDate">',entScape($pFetch['rdate']),'</span><br>',entScape($pFetch['post'],true),'</div>';
+				echo '<div id="tpost"><span id="rName">',entScape($pFetch['poster']),'</span><br><span id="rDate">',entScape(date('M j o g:i A',strtotime($pFetch['rdate']))),'</span><br>',entScape($pFetch['post'],true),'</div>';
 			}
 			echo '<form action="?do=',entScape($_GET['do']),'&action=view&id=',entScape($_GET['id']),'" method="POST">';
 			if($tFetch['status'] == 1)

@@ -72,7 +72,7 @@ if(count($stFetch) > 0)
 	foreach($tQuery as $tFetch)
 	{
 		if($tFetch['poster'] == $_SESSION['user_no']) $tFetch['poster'] = 'You';
-		echo '<div id="tpost"><span id="rName">',entScape($tFetch['poster']),'</span><br><span id="rDate">',entScape($tFetch['rdate']),'</span><br>',entScape($tFetch['post'],true),'</div>';
+		echo '<div id="tpost"><span id="rName">',entScape($tFetch['poster']),'</span><br><span id="rDate">',entScape(date('M j o g:i A',strtotime($tFetch['rdate']))),'</span><br>',entScape($tFetch['post'],true),'</div>';
 	}
 	if($stFetch[0]['status'] == 1)
 	{
@@ -142,7 +142,7 @@ else
 			$status = 'Open';
 			if($tFetch['status'] == 0) $status = 'Closed';
 			if($tFetch['status'] == -1) $status = 'Locked';
-			echo '<tr><td><a href="?do=',entscape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['type']),'</td><td>',entScape($status),'</td><td>',entScape($tFetch['poster']),'<br>',entScape($tFetch['rdate']),'</td></tr>';
+			echo '<tr><td><a href="?do=',entscape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['type']),'</td><td>',entScape($status),'</td><td>',entScape($tFetch['poster']),'<br>',entScape(date('M j o g:i A',strtotime($tFetch['rdate']))),'</td></tr>';
 		}
 		echo '</table>';
 	}
