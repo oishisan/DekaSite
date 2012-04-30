@@ -14,7 +14,7 @@ echo '<table><form action="?do=',entScape($_GET['do']),'"method="POST">
 if(!empty($_POST['select']) && !empty($_POST['charname'])) 
 {
 	$cQuery = msquery("SELECT character_no, count(character_no) as num FROM character.dbo.user_character WHERE character_name = '%s' group by character_no", $_POST['charname']);
-	$cFetch = mssql_fetch_array($cQuery);
+	$cFetch = $cQuery->fetch();
 	if(empty ($_POST['charname']) || $cFetch['num'] != 1) 
 	{
 		echo "<br>Could not find the character name.";

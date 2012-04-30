@@ -26,7 +26,8 @@ if(isset($_POST['build']))
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'ticket_post' and xtype = 'U') CREATE TABLE %s.dbo.ticket_post (tid varchar (50), poster varchar (50) collate Chinese_PRC_CI_AS, post text null, rdate datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
-	while($iFetch = mssql_fetch_array($iQuery))
+	$iQuery = $iQuery -> fetchAll();
+	while($iQuery as $iFetch)
 	{
 		msquery("INSERT INTO %s.dbo.userExt (user_no, user_id) values ('%s', '%s')", $ini['MSSQL']['extrasDB'], $iFetch['user_no'], $iFetch['user_id']);
 	}
@@ -42,20 +43,14 @@ if(isset($_POST['build']))
 }
 else
 {
-	if(mssql_select_db($ini['MSSQL']['extrasDB']))
+	echo 'This page builds non-existing tables in the database.<br><form action="?do=',entscape($_GET['do']),'" method="POST">';
+	$aQuery = msquery("SELECT name FROM %s.dbo.sysobjects where name = 'auth' and xtype = 'U'", $ini['MSSQL']['extrasDB']);
+	if(count($aQuery->fetchAll()) == 0)
 	{
-		echo 'This page builds non-existing tables in the database.<br><form action="?do=',entscape($_GET['do']),'" method="POST">';
-		$aQuery = msquery("SELECT name FROM %s.dbo.sysobjects where name = 'auth' and xtype = 'U'", $ini['MSSQL']['extrasDB']);
-		if(mssql_num_rows($aQuery) == 0)
-		{
-			echo 'Your authorization tables haven\'t been built. Please enter an account ID to be designated as the inital administrator.
-			<br>User ID: <input type="text" name="authID" /><br>Authority: <input type="text" name="auth" value="Admin" /><br>Web name: <input type="text" name="authN" /><br>';
-		}
-		echo'<input type="submit" name="build" value="Build Tables" /></form>';
+		echo 'Your authorization tables haven\'t been built. Please enter an account ID to be designated as the inital administrator.
+		<br>User ID: <input type="text" name="authID" /><br>Authority: <input type="text" name="auth" value="Admin" /><br>Web name: <input type="text" name="authN" /><br>';
 	}
-	else
-	{
-		echo 'The extras database you have specified does not exist. Please create this database with the full permission for the specified MSSQL user in the configuration.';
+	echo'<input type="submit" name="build" value="Build Tables" /></form>';
 	}
 }
 ?>

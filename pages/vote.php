@@ -13,12 +13,12 @@ if($vCount > 0)
 	if(ctype_digit($_GET['site']) && $_GET['site'] < $vCount)
 	{
 		$cQuery = msquery("SELECT count(amount) as num FROM cash.dbo.user_cash WHERE user_no = '%s'", $_SESSION['user_no']);
-		$cFetch = mssql_fetch_array($cQuery);
+		$cFetch = $cQuery->fetch();
 		$vInfo = explode(',',$ini['Other']['vote'][$_GET['site']]);
 		if($cFetch['num'] == 1)
 		{
 			$cQuery = msquery("SELECT top 1 *, count(account) as num FROM %s.dbo.vote WHERE (ip='%s' or account='%s') and link = '%s' group by wDate, ip, account, link order by wDate desc", $ini['MSSQL']['extrasDB'], $_SERVER['REMOTE_ADDR'], $_SESSION['accname'], $vInfo[2]);			
-			$cFetch = mssql_fetch_array($cQuery);
+			$cFetch = $cQuery->fetch();
 			switch($cFetch['num'])
 			{
 				case 0:

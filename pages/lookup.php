@@ -23,23 +23,23 @@ if ((!empty($_POST['data']) && $_POST['type'] == 'account') || ($_GET['type'] ==
 		$data = $_POST['data'];
 	}	
 	$query = msquery("Select count(user_id )as num, user_no from account.dbo.user_profile where user_id = '%s' group by user_no", $data);
-	$fetch = mssql_fetch_array($query);
+	$fetch = $query->fetch();
 	if ($fetch['num'] == '1')
 	{
 		echo 'Account lookup: ',entScape($data),'<br>';
 		echo '<div id="chars"><span id="heading">Characters</span>';
-		$query2 = msquery("Select character_name from character.dbo.user_character where user_no = '%s'", $fetch['user_no']);
-		while ($fetch2 = mssql_fetch_array($query2))
+		$query2 = msquery("Select character_name from character.dbo.user_character where user_no = '%s'", $fetch['user_no'])->fetchAll();
+		foreach($query2 as $fetch2)
 		{
 			echo '<br><a href="?do=',entScape($_GET['do']),'&type=char&data=',entScape($fetch2['character_name']),'">',entScape($fetch2['character_name']),'</a>';
 		}
 		$linked = array();
-		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data);
+		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data)->fetchAll();
 		echo '</div><div id="accts"><span id="heading">Account Links</span>';
-		while ($fetch = mssql_fetch_array($query))
+		foreach($query as $fetch)
 		{
-			$query2 = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id <> '%s' and Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data, $fetch['IP']);
-			while ($fetch2 = mssql_fetch_array($query2))
+			$query2 = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id <> '%s' and Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data, $fetch['IP'])->fetchAll();
+			foreach($query2 as $fetch2)
 			{
 				if (!in_array($fetch2['user_id'], $linked))
 				{
@@ -62,11 +62,10 @@ if ((!empty($_POST['data']) && $_POST['type'] == 'account') || ($_GET['type'] ==
 			echo '<br>No linked accounts';
 		}
 		echo '</div><div id="ips"><span id="heading">Unique IPs</span>';
-		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP, user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data);
-		$rows = mssql_num_rows($query);
-		if ($rows > '0')
+		$query = msquery("select distinct Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) as IP, user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where user_id = '%s'", $data)->fetchAll();
+		if (count($query) > 0)
 		{
-			while ($fetch = mssql_fetch_array($query))
+			foreach($query as $fetch)
 			{
 				echo '<br><a href="?do=',entScape($_GET['do']),'&type=ip&data=',entScape($fetch['IP']),'">',entScape($fetch['IP']),'</a>';
 			}
@@ -93,12 +92,12 @@ elseif ((!empty($_POST['data']) && $_POST['type'] == 'ip') || ($_GET['type'] == 
 		$data = $_POST['data'];
 	}
 	$query = msquery("Select count(conn_ip) as num from account.dbo.user_connlog_key where Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data);
-	$fetch = mssql_fetch_array($query);
+	$fetch = $query->fetch();
 	if ($fetch['num'] > '0')
 	{
-		$query = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data);
+		$query = msquery("select distinct user_id from account.dbo.user_connlog_key left join account.dbo.user_profile on account.dbo.user_profile.user_no = account.dbo.user_connlog_key.user_no where Cast(Cast(SubString(conn_ip, 1, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 2, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 3, 1) AS Int) As Varchar(3)) + '.' + Cast(Cast(SubString(conn_ip, 4, 1) AS Int) As Varchar(3)) = '%s'", $data)->fetchAll();
 		echo 'IP lookup: ',entScape($data);
-		while ($fetch = mssql_fetch_array($query))
+		foreach($query as $fetch)
 		{
 			echo '<br><a href="?do=',entScape($_GET['do']),'&type=account&data=',entScape($fetch['user_id']),'">',entScape($fetch['user_id']),'</a>';
 		}
@@ -119,7 +118,7 @@ elseif((!empty($_POST['data']) && $_POST['type'] == 'char') || (!empty($_GET['da
 		$data = $_POST['data'];
 	}
 	$cQuery = msquery("select user_id, dwMoney, dwStoreMoney, dwStorageMoney, nHP, nMP, wStr, wDex, wCon, wSpr, wStatPoint, wSkillPoint, wLevel, byPCClass, wPKCount, nShield, dwPVPPoint, wWinRecord, wLoseRecord, count(user_id) as num from account.dbo.user_profile left join character.dbo.user_character on account.dbo.user_profile.user_no = character.dbo.user_character.user_no where character_name = '%s' group by user_id, dwMoney, dwStoreMoney, dwStorageMoney, nHP, nMP, wStr, wDex, wCon, wSpr, wStatPoint, wSkillPoint, wLevel, byPCClass, wPKCount, nShield, dwPVPPoint, wWinRecord, wLoseRecord", $data);
-	$cFetch = mssql_fetch_array($cQuery);
+	$cFetch = $cQuery->fetch();
 	if ($cFetch['num'] == '1')
 	{
 		if($cFetch['byPCClass'] == '0') $cFetch['byPCClass'] = 'Knight';

@@ -1,10 +1,10 @@
 <?php
 requireExtras();
 echo '<table><tr>';
-$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER by sid ASC", $ini['MSSQL']['extrasDB']);
-if(mssql_num_rows($dQuery) > 0)
+$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER by sid ASC", $ini['MSSQL']['extrasDB'])->fetchAll();
+if(count($dQuery) > 0)
 {
-	while($dFetch = mssql_fetch_array($dQuery))
+	foreach($dQuery as $dFetch)
 	{
 		echo '
 		<tr><td>',entScape($dFetch['name']),'</td></tr>

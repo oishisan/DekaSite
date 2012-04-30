@@ -26,27 +26,26 @@ if($_GET['action'] == 'new' && $cCount > 0)
 elseif($_GET['action'] == 'view' && isset($_GET['id']))
 {
 $tQuery = msquery("select status, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);
-$rCount = mssql_num_rows($tQuery);
-if($rCount > 0)
+$stFetch = $tQuery->fetchAll();
+if(count($stFetch) > 0)
 {
-	$stFetch = mssql_fetch_array($tQuery);
-	if(isset($_POST['close']) && $stFetch['status'] == 1)
+	if(isset($_POST['close']) && $stFetch[0]['status'] == 1)
 	{
 		msquery("update %s.dbo.tickets set status = '0' where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id']);
-		$stFetch['status'] = 0;
+		$stFetch[0]['status'] = 0;
 	}
-	if(isset($_POST['open']) && $stFetch['status'] == 0)
+	if(isset($_POST['open']) && $stFetch[0]['status'] == 0)
 	{
 		msquery("update %s.dbo.tickets set status = '1' where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id']);
-		$stFetch['status'] = 1;
+		$stFetch[0]['status'] = 1;
 	}
 	if(isset($_POST['rsub']) && isset($_POST['reply']) && !empty($_POST['reply']))
 	{
-		if ($stFetch['status'] == 0)
+		if ($stFetch[0]['status'] == 0)
 		{
 			echo 'You cannot reply because the ticket is closed.';
 		}
-		elseif ($stFetch['status'] == -1)
+		elseif ($stFetch[0]['status'] == -1)
 		{
 			echo 'You cannot reply because the ticket is locked.';
 		}
@@ -54,7 +53,7 @@ if($rCount > 0)
 		{
 			$tError = 0;
 			if(!isset($ini['Other']['ticket.replyWait.'.$auth])) $ini['Other']['ticket.replyWait.'.$auth] = 30;
-			$timeleft = strtotime($stFetch['rdate'].' +'.$ini['Other']['ticket.replyWait.'.$auth].' seconds');
+			$timeleft = strtotime($stFetch[0]['rdate'].' +'.$ini['Other']['ticket.replyWait.'.$auth].' seconds');
 			if ($timeleft > strtotime(date('Y-m-d G:i')))	
 			{
 				$tError = 1;	
@@ -70,17 +69,17 @@ if($rCount > 0)
 		}
 	}
 	$tQuery = msquery("select poster, owner, post, rdate from %s.dbo.ticket_post join %s.dbo.tickets on %s.dbo.tickets.tid = %s.dbo.ticket_post.tid where owner = '%s' and %s.dbo.ticket_post.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no'],$ini['MSSQL']['extrasDB'], $_GET['id']);	
-	while($tFetch = mssql_fetch_array($tQuery))
+	foreach($tQuery as $tFetch)
 	{
 		if($tFetch['poster'] == $_SESSION['user_no']) $tFetch['poster'] = 'You';
 		echo '<div id="tpost"><span id="rName">',entScape($tFetch['poster']),'</span><br><span id="rDate">',entScape($tFetch['rdate']),'</span><br>',entScape($tFetch['post'],true),'</div>';
 	}
-	if($stFetch['status'] == 1)
+	if($stFetch[0]['status'] == 1)
 	{
 		echo '<form action="?do=',entScape($_GET['do']),'&action=view&id=',entScape($_GET['id']),'"method="POST"><textarea cols="75" rows="10" name="reply"></textarea><br>
 		<input type="submit" value="Reply" name="rsub"><input type="submit" value="Close" name="close" /></form>';
 	}
-	if($stFetch['status'] == 0)
+	if($stFetch[0]['status'] == 0)
 	{
 		echo '<form action="?do=',entScape($_GET['do']),'&action=view&id=',entScape($_GET['id']),'"method="POST"><input type="submit" name="open" value="open" /></form>';
 	}
@@ -99,13 +98,13 @@ else
 		{
 			if(isset($_POST['details']) && !empty($_POST['details']) && isset($_POST['title']) && !empty($_POST['title']))
 			{
-				$timeQuery = msquery("select top 1 topen from %s.dbo.tickets where owner = '%s' order by topen desc", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
+				$timeQuery = msquery("select top 1 topen from %s.dbo.tickets where owner = '%s' order by topen desc", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);	
+				$timeFetch = $timeQuery->fetchAll();
 				$tError = 0;
-				if(mssql_num_rows($timeQuery) > 0)
+				if(count($timeFetch) > 0)
 				{
 					if(!isset($ini['Other']['ticket.newWait.'.$auth])) $ini['Other']['ticket.newWait.'.$auth] = 30;
-					$timeFetch = mssql_fetch_array($timeQuery);
-					$timeleft = strtotime($timeFetch['topen'].' +'.$ini['Other']['ticket.newWait.'.$auth].' seconds');
+					$timeleft = strtotime($timeFetch[0]['topen'].' +'.$ini['Other']['ticket.newWait.'.$auth].' seconds');
 					if ($timeleft > strtotime(date('Y-m-d G:i')))	
 					{
 					 $tError = 1;	
@@ -134,10 +133,11 @@ else
 		}
 	}
 	$tQuery = msquery("select t.tid, type, user_id, status, title, rdate, (case when poster = t.owner then 'You' else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and t.owner = '%s' order by rdate desc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-	if(mssql_num_rows($tQuery) > 0)
+	$tQuery = $tQuery->fetchAll();
+	if(count($tQuery) > 0)
 	{
 		echo '<table><tr><th>Title</th><th>Type</th><th>Status</th><th>Last reply</th></tr>';
-		while ($tFetch = mssql_fetch_array($tQuery))
+		foreach($tQuery as $tFetch)
 		{
 			$status = 'Open';
 			if($tFetch['status'] == 0) $status = 'Closed';

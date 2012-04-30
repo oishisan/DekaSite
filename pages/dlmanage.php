@@ -17,7 +17,7 @@ if ($_GET['action'] == "edit")
 if ($_GET['part'] == "edit")
 {
 	$dQuery = msquery("SELECT * FROM %s.dbo.site_download WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']);
-	$dFetch = mssql_fetch_array($dQuery);
+	$dFetch = $dQuery->fetch();
 	echo '<table><form method="POST" action="?do=',entScape($_GET['do']),'&action=edit&sid=',entScape($_GET['sid']),'">
 	<tr><td>Name:<br><input type="text" name="name" value="',entScape($dFetch['name']),'" /></td></tr>
 	<tr><td>Version:<br><input type="text" name="version" value="',entScape($dFetch['version']),'" /></td></tr>
@@ -38,8 +38,8 @@ elseif ($_GET['part'] == "new")
 else
 {
 	echo '<a href="?do=',entScape($_GET['do']),'&part=new">New Download</a><table><tr><th>Name:</th><th>Version:</th></tr>';
-	$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
-	while($dFetch = mssql_fetch_array($dQuery))
+	$dQuery = msquery("SELECT * FROM %s.dbo.site_download ORDER BY sid DESC", $ini['MSSQL']['extrasDB'])->fetchAll();
+	foreach($dQuery as $dFetch)
 	{
 		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($dFetch['sid']),'">[',entScape($dFetch['name']),']</a></td>
 		<td>',entScape($dFetch['version']),'</td>

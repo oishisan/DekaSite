@@ -12,7 +12,7 @@ echo '
 if(isset($_POST['sub']))
 {
 	$query = msquery("SELECT COUNT(user_id) as num FROM account.dbo.USER_PROFILE WHERE user_id = '%s'", $_POST['accname']);
-	$queryF = mssql_fetch_array($query);
+	$queryF = $query->fetch();
 	echo '<tr><td>';
 	if(empty($_POST['accname']) || empty($_POST['accpass1']) || empty($_POST['accpass2']))
 	{

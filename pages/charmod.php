@@ -7,10 +7,10 @@ if((isset($_POST['search']) || (isset($_POST['update']) && !empty($_POST['oChar'
 	{
 		$cQuery = msquery("select character_name from character.dbo.user_character where character_name ='%s'",$_POST['oChar']);
 		$error = null;
-		if(mssql_num_rows($cQuery) == 1)
+		if(count($cQuery->fetchAll()) == 1)
 		{
 			$result = msquery("select account.dbo.user_profile.login_flag from account.dbo.user_profile left join character.dbo.user_character on character.dbo.user_character.user_no = account.dbo.user_profile.user_no WHERE account.dbo.user_profile.login_flag = '1100' and character_name = '%s'", $_POST['oChar']);			
-			if(mssql_num_rows($result) == 0)
+			if(count($result->fetchAll()) == 0)
 			{
 				foreach($_POST as $key=>$val)
 				{
@@ -27,7 +27,7 @@ if((isset($_POST['search']) || (isset($_POST['update']) && !empty($_POST['oChar'
 					if($_POST['schar'] != $_POST['oChar'])
 					{
 						$cQuery = msquery("select character_name from character.dbo.user_character where character_name = '%s'", $_POST['schar']);
-						if(mssql_num_rows($cQuery) == 0)
+						if(count($cQuery->fetchAll()) == 0)
 						{
 							msquery("UPDATE character.dbo.user_character set character_name = '%s' where character_name = '%s'", $_POST['schar'], $_POST['oChar']);
 						}
@@ -54,7 +54,7 @@ if((isset($_POST['search']) || (isset($_POST['update']) && !empty($_POST['oChar'
 		}
 	}
 	$cQuery = msquery("select dwMoney, dwStoreMoney, dwStorageMoney, nHP, nMP, wStr, wDex, wCon, wSpr, wStatPoint, wSkillPoint, wLevel, byPCClass, wPKCount, nShield, dwPVPPoint, wWinRecord, wLoseRecord, count(character_name) as num from character.dbo.user_character where character_name = '%s' group by dwMoney, dwStoreMoney, dwStorageMoney, nHP, nMP, wStr, wDex, wCon, wSpr, wStatPoint, wSkillPoint, wLevel, byPCClass, wPKCount, nShield, dwPVPPoint, wWinRecord, wLoseRecord", $_POST['schar']);
-	$cFetch = mssql_fetch_array($cQuery);
+	$cFetch = $cQuery->fetch();
 	if ($cFetch['num'] == '1')
 	{
 		echo '<form action="?do=',entScape($_GET['do']),'" method="POST">Character: <input type="text" name="schar" value="',entScape($_POST['schar']),'"/><input type="hidden" name="oChar" value="',entScape($_POST['schar']),'" /><br>

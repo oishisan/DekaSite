@@ -32,7 +32,7 @@ echo '>Newest Tickets</option></select><br>
 if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
 {
 	$dQuery = msquery("select type, count(type) as num from %s.dbo.tickets where tid = '%s' group by type", $ini['MSSQL']['extrasDB'], $_GET['id']);
-	$dFetch = mssql_fetch_array($dQuery);
+	$dFetch = $dQuery->fetch();
 	if($dFetch['num'] == 1 && isset($ini['Other']['ticket.manage.'.$_SESSION['auth']]) && isset($ini['Other']['ticket.delete']) && in_array($dFetch['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]) && in_array($_SESSION['auth'], $ini['Other']['ticket.delete']))
 	{
 		msquery("DELETE FROM %s.dbo.tickets where tid = '%s'; DELETE FROM %s.dbo.ticket_post where tid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['id'], $ini['MSSQL']['extrasDB'], $_GET['id']);
@@ -71,12 +71,13 @@ if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) &
 
 		}
 		$tQuery = msquery("select t.tid, user_id, title, lby, rdate, (case when poster = t.owner then user_id else poster end) as poster from %s.dbo.tickets t join (select tid, poster,rdate from %s.dbo.ticket_post tp) tp on tp.tid = t.tid join account.dbo.user_profile a on a.user_no = t.owner where rdate = (select max(rdate) from %s.dbo.ticket_post where tid = t.tid) and type = '%s' and status = '%s' order by %s", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_POST['type'], $_POST['status'], $_POST['order']);
-		if (mssql_num_rows($tQuery) > 0)
+		$tQuery = $tQuery->fetchAll();
+		if (count($tQuery) > 0)
 		{
 			echo '<table><tr><th>By</th><th>Ticket</th><th>Last reply</th>';
 			if($_POST['status'] === -1) echo '<th>Locked by</th>';
 			echo '</tr>';
-			while($tFetch = mssql_fetch_array($tQuery))
+			foreach($tQuery as $tFetch)
 			{
 				echo '<tr><td>',entScape($tFetch['user_id']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=view&id=',entScape($tFetch['tid']),'">',entScape($tFetch['title']),'</a></td><td>',entScape($tFetch['poster']),'<br>',$tFetch['rdate'],'</td>';
 				if($_POST['status'] === -1) echo '<td>',entScape($tFetch['lby']),'</td>';
@@ -98,7 +99,7 @@ if(isset($_POST['search']) && isset($_POST['type']) && isset($_POST['status']) &
 elseif($_GET['action'] == 'view' && isset($_GET['id']))
 {
 	$tQuery = msquery("select type, status, count(type) as num from %s.dbo.tickets where tid = '%s' group by type, status", $ini['MSSQL']['extrasDB'], $_GET['id']);
-	$tFetch = mssql_fetch_array($tQuery);
+	$tFetch = $tQuery->fetch();
 	if($tFetch['num'] == 1)
 	{
 		if(in_array($tFetch['type'], $ini['Other']['ticket.manage.'.$_SESSION['auth']]))
@@ -139,9 +140,10 @@ elseif($_GET['action'] == 'view' && isset($_GET['id']))
 				}
 			}
 			$pQuery = msquery("select poster, owner, post, rdate, user_id from %s.dbo.ticket_post tp join %s.dbo.tickets t on t.tid = tp.tid join account.dbo.user_profile a on a.user_no = t.owner where tp.tid = '%s' order by rdate asc", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_GET['id']);	
-			while($pFetch = mssql_fetch_array($pQuery))
+			$pQuery = $pQuery->fetchAll();
+			foreach($pQuery as $pFetch)
 			{
-				if($pFetch['poster'] == $_SESSION['webName']) $pFetch['poster'] = 'you';
+				if($pFetch['poster'] == $_SESSION['webName']) $pFetch['poster'] = 'You';
 				if($pFetch['poster'] == $pFetch['owner']) $pFetch['poster'] = $pFetch['user_id'];
 				echo '<div id="tpost"><span id="rName">',entScape($pFetch['poster']),'</span><br><span id="rDate">',entScape($pFetch['rdate']),'</span><br>',entScape($pFetch['post'],true),'</div>';
 			}

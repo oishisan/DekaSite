@@ -3,11 +3,10 @@ echo '<table>';
 if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['charname']))
 {
 	$query = msquery("select account.dbo.user_profile.login_flag from account.dbo.user_profile left join character.dbo.user_character on character.dbo.user_character.user_no = account.dbo.user_profile.user_no where character_name = '%s'", $_POST['charname']);
-	$count = mssql_num_rows($query);
-	if ($count == 1)
+	$fetch = $query->fetchAll();
+	if (count($fetch) == 1)
 	{
-		$fetch = mssql_fetch_array($query);
-		if ($fetch['login_flag'] == '0')
+		if ($fetch[0]['login_flag'] == '0')
 		{
 			$name = str_replace('[GM]', '', $_POST['charname']);
 			$name = str_replace('[DEV]', '', $name);
@@ -17,8 +16,7 @@ if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['ch
 				$name = '['.$_POST['charauth'].']'.$name;
 			}
 			$query = msquery("select character_name from character.dbo.user_character where character_name = '%s'", $name);
-			$count = mssql_num_rows($query);
-			if ($count == 0)
+			if (count($query->fetchAll()) == 0)
 			{
 				msquery("UPDATE character.dbo.user_character set character_name = '%s' where character_name = '%s'", $name, $_POST['charname']);
 				echo '<tr><td>',entScape($_POST['charname']),' has been succesfully renamed to ',entScape($name),'.</td></tr>';
@@ -42,12 +40,13 @@ if($_POST['charSet'] == 'Set' && !empty($_POST['charauth']) && !empty($_POST['ch
 elseif (!empty($_GET['acct']))
 {
 	$query = msquery("SELECT account from %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_GET['acct']);
-	$count = mssql_num_rows($query);
-	if ($count == '1')
+	$count = count($query->fetchAll());
+	if ($count == 1)
 	{
 		$query = msquery("select character_name from character.dbo.user_character left join account.dbo.user_profile on account.dbo.user_profile.user_no = character.dbo.user_character.user_no where account.dbo.user_profile.user_id = '%s'", $_GET['acct']);
 		echo '<form action="?do=',entScape($_GET['do']),'" method="post"><tr><td>Character: <select name=charname>';
-		while($fetch = mssql_fetch_array($query))
+		$query = $query->fetchAll();
+		foreach($query as $fetch)
 		{
 			echo '<option value="',entScape($fetch['character_name']),'" selected>',entScape($fetch['character_name']),'</option>';
 		}
@@ -65,7 +64,7 @@ elseif (!empty($_GET['acct']))
 			</tr>
 		</form>';
 	}
-	elseif($count > '1')
+	elseif($count > 1)
 	{
 		echo '<tr><td>Please warn administrator about account duplication.</td></tr></table>';
 	}
@@ -84,7 +83,7 @@ else
 	if(isset($_POST['type']) && !empty($_POST['acct']) && !empty($_POST['auth']) && !empty($_POST['webName']))
 	{
 		$query = msquery("SELECT account FROM %s.dbo.auth where account = '%s'", $ini['MSSQL']['extrasDB'], $_POST['acct']);
-		if(mssql_num_rows($query) == 0)
+		if(count($query->fetchAll()) == 0)
 		{
 			msquery("INSERT INTO %s.dbo.auth (account, auth, webName) values ('%s','%s','%s')", $ini['MSSQL']['extrasDB'],$_POST['acct'], $_POST['auth'], $_POST['webName']);
 			echo '<tr><td colspan="4">Account ',entScape($_POST['acct']),' successfully added!</td></tr>';
@@ -96,6 +95,7 @@ else
 		}
 	}	
 	$acctQuery = msquery("SELECT * FROM %s.dbo.auth order by auth asc", $ini['MSSQL']['extrasDB']);
+	$acctQuery = $acctQuery->fetchAll();
 	echo '
 	<form action="?do='.entScape($_GET['do']).'" method="POST">
 		<tr>
@@ -103,7 +103,7 @@ else
 			<th>Authority</th>
 			<th>Web Name</th>
 		</tr>';
-	while ($acct = mssql_fetch_array($acctQuery))
+	foreach($acctQuery as $acct)
 	{
 		echo '<tr><td><a href="?do='.entScape($_GET['do']).'&acct=',entScape($acct['account']),'">',entScape($acct['account']),'</a></td>
 		<td>',entScape($acct['auth']),'</td>
@@ -111,19 +111,10 @@ else
 		<td><a href="?do='.entScape($_GET['do']).'&type=Delete&delacct=',entScape($acct['account']),'">Remove</a></td>
 		</tr>';
 	}
-	echo '
-		<tr>
-			<td colspan="4">Account: <input type="text" name="acct" /></td>
-		</tr>
-		<tr>
-			<td colspan="4">Web name: <input type="text" name="webName" /></td>
-		</tr>
-		<tr>
-			<td colspan="4">Authority: <input type="text" name="auth" /></td>
-		</tr>
-		<tr>
-			<td colspan="4"><input name="type" type="submit" value="Add/Update"/></td>
-		</tr>
+	echo '<tr><td colspan="4">Account: <input type="text" name="acct" /></td></tr>
+		<tr><td colspan="4">Web name: <input type="text" name="webName" /></td></tr>
+		<tr><td colspan="4">Authority: <input type="text" name="auth" /></td></tr>
+		<tr><td colspan="4"><input name="type" type="submit" value="Add/Update"/></td></tr>
 	</form>';
 }
 ?>

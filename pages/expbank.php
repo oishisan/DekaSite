@@ -18,18 +18,18 @@ if($_GET['type'] == 'gift' && $ini['Other']['expbank.giftEnabled'] == true)
 		if(ctype_digit($_POST['sendExp']))
 		{
 			$query = msquery("SELECT (amount + free_amount) as coins, exp from cash.dbo.user_cash left join %s.dbo.userExt on cash.dbo.user_cash.user_no = %s.dbo.userExt.user_no where cash.dbo.user_cash.user_no = '%s'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-			if (mssql_num_rows($query) == 1)
+			$fetch = $query->fetchAll();
+			if (count(fetch) == 1)
 			{
-				$fetch = mssql_fetch_array($query);
-				if ($fetch['coins'] >= $ini['Other']['expbank.giftprice'] && $fetch['exp'] >= $_POST['sendExp'])
+				if ($fetch[0]['coins'] >= $ini['Other']['expbank.giftprice'] && $fetch[0]['exp'] >= $_POST['sendExp'])
 				{
 					$query2 = msquery("SELECT user_no, count(user_no) as num from character.dbo.user_character where character_name = '%s' group by user_no", $_POST['sendTo']);
-					$fetch2 = mssql_fetch_array($query2);
-					if ($fetch2['num'] == 1)
+					$fetch2 = $query2->fetchAll();
+					if ($fetch2[0]['num'] == 1)
 					{
 						msquery("UPDATE cash.dbo.user_cash SET amount = amount - '%s' where user_no = '%s'", $ini['Other']['expbank.giftprice'], $_SESSION['user_no']);
 						msquery("UPDATE %s.dbo.userExt SET exp = exp - '%s'where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_POST['sendExp'], $_SESSION['user_no']);
-						msquery("UPDATE %s.dbo.userExt SET exp = exp + '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_POST['sendExp'], $fetch2['user_no']);
+						msquery("UPDATE %s.dbo.userExt SET exp = exp + '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_POST['sendExp'], $fetch2[0]['user_no']);
 						echo entScape($_POST['sendTo']),' has successfully received ',entScape($_POST['sendExp']),' experience in their bank!';
 					}
 					else
@@ -53,7 +53,7 @@ if($_GET['type'] == 'gift' && $ini['Other']['expbank.giftEnabled'] == true)
 		}
 	}
 	$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-	$bankedList = mssql_fetch_array($bankedQuery);
+	$bankedList = $bankedQuery->fetch();
 	echo '<table><form name="processexp" action="?do=',entScape($_GET['do']),'&type=gift" method="POST">
 	<tr><td>Banked Experence: <b>',entScape($bankedList['exp']),'</b></td></tr>
 	<tr><td>Character:<br><input type="text" name="sendTo"></input></td></tr>
@@ -90,10 +90,10 @@ elseif($_GET['type'] == 'list' && $ini['Other']['expbank.listEnabled'] == true)
 		else
 		{
 			$query = msquery("SELECT amount from cash.dbo.user_cash where cash.dbo.user_cash.user_no = '%s'", $_SESSION['user_no']);
-			if (mssql_num_rows($query) == 1)
+			if (count($query->fetchAll()) == 1)
 			{
 				$infoQuery = msquery("SELECT exp from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-				$info = mssql_fetch_array($infoQuery);
+				$info = $infoQuery->fetch();
 				if ($info['exp'] >= $_POST['exp'])
 				{
 					$exp = $info['exp'] - $_POST['exp'];
@@ -113,7 +113,7 @@ elseif($_GET['type'] == 'list' && $ini['Other']['expbank.listEnabled'] == true)
 		}
 	}
 	$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-	$bankedList = mssql_fetch_array($bankedQuery);
+	$bankedList = $bankedQuery->fetch();
 	echo '<table><form name="processexp" action="?do=',entScape($_GET['do']),'&type=list" method="POST"><tr><td>Banked Experence: <b>',entScape($bankedList['exp']),'</b></td></tr>';
 	echo '<tr><td>Experience:<br><input type="text" name="exp" /></td></tr>
 	<tr><td>D-Coins:<br><input type="text" name="dcoins" /></td></tr>
@@ -124,12 +124,13 @@ elseif($_GET['type'] == 'list' && $ini['Other']['expbank.listEnabled'] == true)
 elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == true)
 {
 	$acctQuery = msquery("SELECT (amount + free_amount) as total from cash.dbo.user_cash where user_no = '%s'", $_SESSION['user_no']);
-	if (mssql_num_rows($acctQuery) == 1)
+	$acctCoins = $acctQuery->fetchAll();
+	if (count($acctCoins) == 1)
 	{
 		if(($_GET['action'] == 'delete' || $_GET['action'] == 'buy') && !empty($_GET['aid']) && ctype_digit($_GET['aid']))
 		{
 			$auQuery = msquery("Select *,count(auctionID) as num FROM %s.dbo.blist where auctionID = '%s' group by auctionID, aid, exp, coins", $ini['MSSQL']['extrasDB'], $_GET['aid']);
-			$auInfo = mssql_fetch_array($auQuery);
+			$auInfo = $auQuery->fetch();
 			if ($auInfo['num'] == '1')
 			{
 				if($_GET['action'] == 'delete')
@@ -138,7 +139,7 @@ elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == tru
 					{
 						msquery("DELETE FROM %s.dbo.blist where auctionID = '%s'", $ini['MSSQL']['extrasDB'], $auInfo['auctionID']);
 						$bankQuery = msquery("SELECT exp from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-						$bankInfo = mssql_fetch_array($bankQuery);
+						$bankInfo = $bankQuery->fetch();
 						$exp = $bankInfo['exp'] + $auInfo['exp'];
 						msquery("UPDATE %s.dbo.userExt SET exp = '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], $exp, $_SESSION['user_no']);
 						echo 'Auction ',entScape($auInfo['auctionID']),' successfully deleted and ',entScape($auInfo['exp']),' experience returned to your bank.';
@@ -152,8 +153,7 @@ elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == tru
 				{
 					if ($auInfo['aid'] != $_SESSION['user_no'])
 					{
-						$acctCoins = mssql_fetch_array($acctQuery);
-						if ( $acctCoins['total'] >= $auInfo['coins'])
+						if ( $acctCoins[0]['total'] >= $auInfo['coins'])
 						{
 							msquery("UPDATE cash.dbo.user_cash SET amount = amount - '%s' where user_no = '%s'", $auInfo['coins'], $_SESSION['user_no']);
 							msquery("DELETE FROM %s.dbo.blist where auctionID = '%s'", $ini['MSSQL']['extrasDB'], $auInfo['auctionID']);
@@ -179,11 +179,12 @@ elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == tru
 		}	
 		$listQuery = msquery("SELECT * from %s.dbo.blist", $ini['MSSQL']['extrasDB']);
 		$acctQuery = msquery("SELECT (amount + free_amount) as total from cash.dbo.user_cash where user_no = '%s'", $_SESSION['user_no']);	
-		$acctCoins = mssql_fetch_array($acctQuery);
+		$acctCoins = $acctQuery->fetch();
+		$listQuery = $listQuery->fetchAll();
 		echo '<table>
 		<tr><td colspan="3">Your D-Coins: ',entscape($acctCoins['total']),'</td></tr>
 		<tr><th>Experience</th><th>Price</th></tr>';
-		while ($listings = mssql_fetch_array($listQuery))
+		foreach ($listQuery as $listings)
 		{
 			echo '<tr><td>',entScape($listings['exp']),'</td><td>',entScape($listings['coins']),'</td>';
 			if ($listings['aid'] == $_SESSION['user_no'])
@@ -208,8 +209,8 @@ elseif($_GET['type'] == 'listing' && $ini['Other']['expbank.listEnabled'] == tru
 }
 else 
 {
-	$charQuery = msquery("SELECT character_name FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no']);
-	if (mssql_num_rows($charQuery) > 0)
+	$charQuery = msquery("SELECT character_name FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no'])->fetchAll();
+	if (count($charQuery) > 0)
 	{
 		if($_POST['type'] == 'Deposit' || $_POST['type'] == 'Deposit All' || $_POST['type'] == 'Withdraw' || $_POST['type'] == 'Withdraw Max')
 		{
@@ -231,17 +232,17 @@ else
 			{
 				
 				$loginQuery = msquery("SELECT login_flag FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
-				$loginFlag = mssql_fetch_array($loginQuery);
+				$loginFlag = $loginQuery->fetch();
 				if ($loginFlag['login_flag'] == '0')
 				{
 					$infoQuery = msquery("SELECT dwExp, count(dwExp) as num from character.dbo.user_character where character_name = '%s' and user_no = '%s' group by dwExp", $_POST['oCharList'], $_SESSION['user_no']);
-					$info = mssql_fetch_array($infoQuery);
+					$info = $infoQuery->fetch();
 					if ($info['num'] == 1)
 					{
 						if($_POST['type'] == 'Withdraw' || $_POST['type'] == 'Withdraw Max')
 						{
 							$bankedQuery = msquery("SELECT exp from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-							$bankedList = mssql_fetch_array($bankedQuery);
+							$bankedList = $bankedQuery->fetch();
 							if ($_POST['type'] == 'Withdraw Max')
 							{
 								if ($bankedList['exp'] >= '2147483648')
@@ -284,7 +285,7 @@ else
 								$exp = $info['dwExp'] - $_POST['exp'];
 								msquery("UPDATE character.dbo.user_character set dwEXP = '%s' where character_name = '%s'", $exp, $_POST['oCharList']);
 								$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-								$bankedList = mssql_fetch_array($bankedQuery);
+								$bankedList = $bankedQuery->fetch();
 								$exp = $bankedList['exp'] + $_POST['exp'];
 								msquery("UPDATE %s.dbo.userExt SET exp = '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], $exp, $_SESSION['user_no']);
 								echo 'You have successfully banked ',entScape($_POST['exp']),' experience off of ',entScape($_POST['oCharList']),'.';
@@ -308,12 +309,12 @@ else
 			}
 		}
 		$bankedQuery = msquery("SELECT exp FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-		$bankedList = mssql_fetch_array($bankedQuery);
-		$charQuery = msquery("SELECT character_name, dwExp FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no']);
+		$bankedList = $bankedQuery->fetch();
+		$charQuery = msquery("SELECT character_name, dwExp FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no'])->fetchAll();
 		echo '<table>
 		<form name="processexp" action="?do=',entScape($_GET['do']),'&type=bank" method="POST">
 		<tr><td>Banked Experence: <b>',entScape($bankedList['exp']),'</b></td></tr><tr><td><select name="oCharList">';
-		while ($charList = mssql_fetch_array($charQuery))
+		foreach ($charQuery as $charList)
 		{
 			echo '<option value="',entScape($charList['character_name']),'">',entScape($charList['character_name']),' (',entScape($charList['dwExp']),')</option>';
 		}

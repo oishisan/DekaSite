@@ -45,17 +45,16 @@ if ($_GET['part'] == "new")
 } 
 elseif ($_GET['part'] == "edit")
 {
-	$eQuery = msquery("SELECT * FROM %s.dbo.event WHERE eid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['eid']);
+	$eQuery = msquery("SELECT * FROM %s.dbo.event WHERE eid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['eid'])->fetchAll();
 	echo '<table>';
-	if (mssql_num_rows($eQuery) == 1)
+	if (count($eQuery) == 1)
 	{
-		$eFetch = mssql_fetch_array($eQuery);
 		echo '<form method="POST" action="?do=',entScape($_GET['do']),'&action=edit">
-		<tr><td><input type="hidden" name="eid" value="',entScape($eFetch['eID']),'" />Name:<br>
-		<input type="text" name="title" value="',entScape($eFetch['eName']),'" /></td></tr>
-		<tr><td>Start Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="sdate" value="',entScape($eFetch['eStart']),'" /></td></tr>
-		<tr><td>End Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="edate" value="',entScape($eFetch['eEnd']),'" /></td></tr>
-		<tr><td>Description:<br><textarea name="content">',entScape($eFetch['eDesc']),'</textarea></td></tr>
+		<tr><td><input type="hidden" name="eid" value="',entScape($eQuery[0]['eID']),'" />Name:<br>
+		<input type="text" name="title" value="',entScape($eQuery[0]['eName']),'" /></td></tr>
+		<tr><td>Start Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="sdate" value="',entScape($eQuery[0]['eStart']),'" /></td></tr>
+		<tr><td>End Date (MM/DD/YYYY HH:MM AM/PM)<br><input type="text" name="edate" value="',entScape($eQuery[0]['eEnd']),'" /></td></tr>
+		<tr><td>Description:<br><textarea name="content">',entScape($eQuery[0]['eDesc']),'</textarea></td></tr>
 		<tr><td><input type="submit" value="Edit" /></td></tr></form>';
 	}
 	else
@@ -67,8 +66,8 @@ elseif ($_GET['part'] == "edit")
 else
 {
 	echo '<a href="?do=',entScape($_GET['do']),'&part=new">Add Event</a><table><tr><th>Event</th><th>Host</th><th>Start Date</th><th>End Date</th></tr>';
-	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB']);
-	while($eFetch = mssql_fetch_array($eQuery))
+	$eQuery = msquery("SELECT eID, eName, eHost, eStart, eEnd FROM %s.dbo.event ORDER BY eStart desc, eEnd desc", $ini['MSSQL']['extrasDB'])->fetchAll();
+	foreach($eQuery as $eFetch)
 	{
 		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&eid=',entScape($eFetch['eID']),'">[',entScape($eFetch['eName']),']</a></td><td>',entScape($eFetch['eHost']),'</td><td>',entScape($eFetch['eStart']),'</td><td>',entScape($eFetch['eEnd']),'</td><td><a href="?do=',entScape($_GET['do']),'&action=delete&eid=',entScape($eFetch['eID']),'">Delete</a></td></tr>';
 	}

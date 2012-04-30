@@ -19,8 +19,8 @@ echo '
 	
 if(isset($_POST['upass']))
 {
-	$result1 = msquery("SELECT user_pwd FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
-	$count1 = mssql_fetch_array($result1);
+	$query = msquery("SELECT user_pwd FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
+	$fetch = $query->fetch();
 	if(empty($_POST['old']) || empty($_POST['new1']) || empty($_POST['new2']))
 	{
 		echo 'You have not filled in all fields.';

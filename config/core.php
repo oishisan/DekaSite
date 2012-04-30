@@ -1,30 +1,17 @@
 ﻿<?php
 // Check for faggot quotes
-if(get_magic_quotes_gpc())
+if(get_magic_quotes_gpc() || ini_get('magic_quotes_sybase'))
 {
 	echo 'Please set magic_quotes_gpc to "Off" in your php.ini.';
 	exit(0);
 }
-if(get_magic_quotes_runtime())
-{
-    set_magic_quotes_runtime(false);
-}
+set_magic_quotes_runtime(false);
 
 // Set compression
 ini_set('zlib.output_compression', 'On');
 
 // Parse Config.ini
 $ini = parse_ini_file('config.ini', true);
-
-//Connect to the database
-$ms_con = mssql_pconnect($ini['MSSQL']['host'],$ini['MSSQL']['user'],$ini['MSSQL']['password']);
-
-//Check if database connection can be established
-if ($ms_con == false)
-{
-	echo 'Database connection could not be established';
-	exit(0);
-}
 
 /*
 Function to query mssql safely
@@ -35,39 +22,67 @@ Parameters:
 */
 function msquery()
 {
+	$con;
+	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+	{
+		if(!extension_loaded('PDO_ODBC'))
+		{
+			echo 'Please enable the extension php_pdo_odbc.dll.';
+			exit(0);
+		}
+		try
+		{
+			$con = new PDO('odbc:Driver={SQL Server};server='.$GLOBALS['ini']['MSSQL']['host'].';uid='.$GLOBALS['ini']['MSSQL']['user'].';pwd='.$GLOBALS['ini']['MSSQL']['password'].';');
+		}
+		catch (PDOException $err)
+		{
+			echo 'Database connection failed.';
+			exit(0);
+		}
+
+	}
+	else
+	{
+		if(!extension_loaded('pdo_dblib'))
+		{
+			echo 'Please enable the extension pdo_dblib.so.';
+			exit(0);
+		}
+		try
+		{
+			$con = new PDO('dblib:host='.$GLOBALS['ini']['MSSQL']['host'].':1433', $GLOBALS['ini']['MSSQL']['user'], $GLOBALS['ini']['MSSQL']['password']);
+		}
+		catch (PDOException $err)
+		{
+			echo 'Database connection failed.<br>',$err;
+			exit(0);
+		}
+
+	}
 	$args = func_get_args();
 	$num = func_num_args();
+	$query = false;
 	if($num > 1)
 	{
 		$array = array();
 		for($i=1;$i < $num; $i++)
 		{	
-			// Escape all input data.
 			$array[] = preg_replace('/\'/','\'\'', $args[$i]);
 		}
-		$query = mssql_query(vsprintf($args[0], $array),$GLOBALS['ms_con']);
-		if($query)
-		{
-			return $query;
-		}
-		else
-		{
-			echo '<br>Query failed!</br>';
-			exit(0);
-		}
+		$query = $con->query(vsprintf($args[0], $array));
 	}
 	else
 	{
-		$query = mssql_query($args[0],$GLOBALS['ms_con']);
-		if($query)
-		{
-			return $query;
-		}
-		else
-		{
-			echo '<br>Query failed!</br>';
-			exit (0);
-		}
+		$query = $con->query($args[0]);
+	}
+	if($query)
+	{
+		return $query;
+	}
+	else
+	{
+		echo '<br>Query failed!</br>';
+		exit(0);
 	}
 }
 
@@ -276,33 +291,26 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 'guest') || (isset($_SES
 	{
 		$accountInfo = msquery("SELECT user_no, login_tag, COUNT(user_no) as num FROM account.dbo.user_profile WHERE user_id = '%s' GROUP BY user_no, login_tag",$_SESSION['accname']);
 	}
-	if ($accountInfo)
+	$getAccount = $accountInfo->fetch();
+	if ($getAccount['num'] == 1)
 	{
-		$getAccount = mssql_fetch_array($accountInfo);
-		if ($getAccount['num'] == 1)
+		if (isset($_POST['login']) && $_SESSION['auth'] == 'guest') 
 		{
-			if (isset($_POST['login']) && $_SESSION['auth'] == 'guest') 
+			$_SESSION['accname'] = $_POST['accname'];
+			sLog('Login success');
+		}
+		$_SESSION['lTag'] = $getAccount['login_tag'];
+		$_SESSION['user_no'] = $getAccount['user_no'];
+		if($ini['MSSQL']['extras'] == true)
+		{
+			$authQ = msquery("Select auth,webName, count(auth) as num FROM %s.dbo.auth where account ='%s' group by auth,webName",$ini['MSSQL']['extrasDB'],$_SESSION['accname']);
+			$authA = $authQ->fetch();
+			if($authA['num'] == 1)
 			{
-				$_SESSION['accname'] = $_POST['accname'];
-				sLog('Login success');
-			}
-			$_SESSION['lTag'] = $getAccount['login_tag'];
-			$_SESSION['user_no'] = $getAccount['user_no'];
-			if($ini['MSSQL']['extras'] == true)
-			{
-				$authQ = msquery("Select auth,webName, count(auth) as num FROM %s.dbo.auth where account ='%s' group by auth,webName",$ini['MSSQL']['extrasDB'],$_SESSION['accname']);
-				$authA = mssql_fetch_array($authQ);
-				if($authA['num'] == 1)
+				if($_SESSION['auth'] != $authA['auth'])
 				{
-					if($_SESSION['auth'] != $authA['auth'])
-					{
-						$_SESSION['auth'] = $authA['auth'];
-						$_SESSION['webName'] = $authA['webName'];
-					}
-				}
-				else
-				{
-					$_SESSION['auth'] = 'member';
+					$_SESSION['auth'] = $authA['auth'];
+					$_SESSION['webName'] = $authA['webName'];
 				}
 			}
 			else
@@ -310,20 +318,19 @@ elseif ((isset($_POST['login']) && $_SESSION['auth'] == 'guest') || (isset($_SES
 				$_SESSION['auth'] = 'member';
 			}
 		}
-		elseif ($getAcount['num'] == 0)
-		{
-			$errormsg = 'Invalid username or password.';
-			sLog('Login failure', $_POST['accname']);
-		}
 		else
 		{
-			$errormsg = 'Account confliction occured! Please contact your administrator.';
+			$_SESSION['auth'] = 'member';
 		}
+	}
+	elseif ($getAcount['num'] == 0)
+	{
+		$errormsg = 'Invalid username or password.';
+		sLog('Login failure', $_POST['accname']);
 	}
 	else
 	{
-		echo 'Unable to connect to the database.';
-		exit(0);
+		$errormsg = 'Account confliction occured! Please contact your administrator.';
 	}
 }
 authPages($ini, $_SESSION['aSites']);

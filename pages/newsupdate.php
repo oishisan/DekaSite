@@ -8,8 +8,8 @@ if ($_GET['part'] == "new")
 } 
 elseif ($_GET['part'] == "edit")
 {
-	$query = msquery("SELECT * FROM %s.dbo.site_news WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid']);
-	while($r = mssql_fetch_array($query))
+	$query = msquery("SELECT * FROM %s.dbo.site_news WHERE sid = '%s'", $ini['MSSQL']['extrasDB'], $_GET['sid'])->fetchAll();
+	foreach($query as $r)
 	{
 		echo '<table>
 		<form method="POST" action="?do=',entScape($_GET['do']),'&type=edit">
@@ -36,8 +36,8 @@ else
 		msquery("INSERT INTO %s.dbo.site_news (title,wroteby,wrotedate,content) VALUES ('%s','%s','%s','%s')", $ini['MSSQL']['extrasDB'], $_POST['title'], $_SESSION['webName'], $time, $_POST['content']);
 	}
 	echo '<a href="?do=',entScape($_GET['do']),'&part=new">Add News</a><table><tr><th>Title</th><th>Written By</th><th>Date</th></tr>';
-	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB']);
-	while($r = mssql_fetch_array($query))
+	$query = msquery("SELECT * FROM %s.dbo.site_news ORDER BY sid DESC", $ini['MSSQL']['extrasDB'])->fetchAll();
+	foreach($query as $r)
 	{
 		echo '<tr><td><a href="?do=',entScape($_GET['do']),'&part=edit&sid=',entScape($r['sid']),'">[',entScape($r['title']),']</a></td><td>',entScape($r['wroteby']),'</td><td>',entScape($r['wrotedate']),'</td><td><a href="?do=newsupdate&type=delete&sid=',entScape($r['sid']),'">Delete</a></td></tr>';
 	}

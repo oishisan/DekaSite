@@ -13,7 +13,7 @@ if(!empty($_POST['select']) && !empty($_POST['charname']))
 	else
 	{
 		$query = msquery("select count(amount) as num from cash.dbo.user_cash join character.dbo.user_character on character.dbo.user_character.user_no = cash.dbo.user_cash.user_no where character_name= '%s'", $_POST['charname']);
-		$fetchQ = mssql_fetch_array($query);
+		$fetchQ = $query->fetch();
 		if ($fetchQ['num'] == 1)
 		{
 			msquery("update cash.dbo.user_cash set amount = amount + '%s' - '%s' from cash.dbo.user_cash join character.dbo.user_character on character.dbo.user_character.user_no = cash.dbo.user_cash.user_no where character_name= '%s'", $_POST['coinsP'], $_POST['coinsM'], $_POST['charname']);

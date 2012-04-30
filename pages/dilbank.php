@@ -17,7 +17,7 @@ if($_GET['action'] == 'buy' && ($ini['Other']['dilbank.coinEnabled'] == true || 
 		else
 		{
 			$query = msquery("SELECT (cash.dbo.user_cash.amount + cash.dbo.user_cash.free_amount) as total, dil ,count(cash.dbo.user_cash.amount) as num from cash.dbo.user_cash left join %s.dbo.userExt on cash.dbo.user_cash.user_no = %s.dbo.userExt.user_no where cash.dbo.user_cash.user_no = '%s' group by cash.dbo.user_cash.amount, cash.dbo.user_cash.free_amount, dil", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-			$arrayQ = mssql_fetch_array($query);
+			$arrayQ = $query->fetch();
 			if ($arrayQ['num'] == 1)
 			{
 				if($_POST['bType'] == 'coin')
@@ -71,7 +71,7 @@ if($_GET['action'] == 'buy' && ($ini['Other']['dilbank.coinEnabled'] == true || 
 	}
 
 	$bQuery = msquery("SELECT dil FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-	$bFetch = mssql_fetch_array($bQuery);
+	$bFetch = $bQuery->fetch();
 	echo 'Banked dil: <b>',$bFetch['dil'],'</b>
 	<br>Dil to coin ratio: <b>',entScape($ini['Other']['dilbank.price']),':1</b>
 	<form action="?do=',$_GET['do'],'&action=buy" method="POST">
@@ -84,8 +84,8 @@ if($_GET['action'] == 'buy' && ($ini['Other']['dilbank.coinEnabled'] == true || 
 }
 else
 {
-	$charQuery = msquery("SELECT character_name FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no']);
-	if (mssql_num_rows($charQuery) > 0)
+	$charQuery = msquery("SELECT character_name FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no'])->fetchAll();
+	if (count($charQuery) > 0)
 	{
 		if($_POST['type'] == 'Deposit' || $_POST['type'] == 'Deposit All' || $_POST['type'] == 'Withdraw' || $_POST['type'] == 'Withdraw Max')
 		{
@@ -107,17 +107,17 @@ else
 			{
 				
 				$loginQuery = msquery("SELECT login_flag FROM account.dbo.user_profile WHERE user_no = '%s'", $_SESSION['user_no']);
-				$loginFlag = mssql_fetch_array($loginQuery);
+				$loginFlag = $loginQuery->fetch();
 				if ($loginFlag['login_flag'] == '0')
 				{
 					$infoQuery = msquery("SELECT dwMoney, count(dwMoney) as num from character.dbo.user_character where character_name = '%s' and user_no = '%s' group by dwMoney", $_POST['oCharList'], $_SESSION['user_no']);
-					$info = mssql_fetch_array($infoQuery);
+					$info = $infoQuery->fetch();
 					if ($info['num'] == 1)
 					{
 						if($_POST['type'] == 'Withdraw' || $_POST['type'] == 'Withdraw Max')
 						{
 							$bankedQuery = msquery("SELECT dil from %s.dbo.userExt where user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-							$bankedList = mssql_fetch_array($bankedQuery);
+							$bankedList = $bankedQuery->fetch();
 							if ($_POST['type'] == 'Withdraw Max')
 							{
 								if ($bankedList['dil'] >= '1000000000')
@@ -160,7 +160,7 @@ else
 								$exp = $info['dwMoney'] - $_POST['dil'];
 								msquery("UPDATE character.dbo.user_character set dwMoney = '%s' where character_name = '%s'", $exp, $_POST['oCharList']);
 								$bankedQuery = msquery("SELECT dil FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-								$bankedList = mssql_fetch_array($bankedQuery);
+								$bankedList = $bankedQuery->fetch();
 								$exp = $bankedList['dil'] + $_POST['dil'];
 								msquery("UPDATE %s.dbo.userExt SET dil = '%s' where user_no = '%s'", $ini['MSSQL']['extrasDB'], $exp, $_SESSION['user_no']);
 								echo 'You have successfully banked ',entScape($_POST['dil']),' Dil off of ',entScape($_POST['oCharList']),'.';
@@ -184,12 +184,12 @@ else
 			}
 		}
 		$bankedQuery = msquery("SELECT dil FROM %s.dbo.userExt WHERE user_no = '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no']);
-		$bankedList = mssql_fetch_array($bankedQuery);
-		$charQuery = msquery("SELECT character_name, dwMoney FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no']);
+		$bankedList = $bankedQuery->fetch();
+		$charQuery = msquery("SELECT character_name, dwMoney FROM character.dbo.user_character WHERE user_no = '%s'", $_SESSION['user_no'])->fetchAll();
 		echo '<table>
 		<form action="?do=',entScape($_GET['do']),'&type=bank" method="POST">
 		<tr><td>Banked dil: <b>',entScape($bankedList['dil']),'</b></td></tr><tr><td><select name="oCharList">';
-		while ($charList = mssql_fetch_array($charQuery))
+		foreach ($charQuery as $charList)
 		{
 			echo '<option value="',entScape($charList['character_name']),'">',entScape($charList['character_name']),' (',entScape($charList['dwMoney']),')</option>';
 		}

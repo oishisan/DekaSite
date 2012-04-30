@@ -1,17 +1,17 @@
 <?php
 $query = msquery("SELECT character_name ,dwPVPpoint, wWinRecord, wLoseRecord from character.dbo.user_character where user_no = '%s' order by dwPVPpoint desc, wWinRecord asc, wLoseRecord asc", $_SESSION['user_no']);
+$query = $query->fetchAll();
 echo '<table>';
-if (mssql_num_rows($query) > 0)
+if (count($query) > 0)
 {
-	echo '
-	<tr>
+	echo '<tr>
 		<th>Character</th>
 		<th>Points</th>
 		<th>Wins</th>
 		<th>Losses</th>
 		<th>W/L ratio</th>
 	</tr>';
-	while($list = mssql_fetch_array($query))
+	foreach($query as $list)
 	{
 		echo '
 		<tr>

@@ -17,10 +17,10 @@ $eQuery = msquery("SELECT * FROM %s.dbo.event where eEnd>getdate() ORDER by eSta
 echo '<html><title>',entScape($ini['Other']['site.title']),' Events</title><head><style type="text/css">';
         include $ini['Other']['site.css'];
 echo '</style></head><body><div id="cTime">Current time: ',entScape(date("M j o g:i A")),'</div>';
-$count = mssql_num_rows($eQuery);
-if ($count > 0)
+$eQuery = $eQuery->fetchAll();
+if (count($eQuery) > 0)
 {
-	while($eFetch = mssql_fetch_array($eQuery))
+	foreach($eQuery as $eFetch)
 	{
 		echo '<div id="eContainer"><span id="name">',entScape($eFetch['eName']),'</span><br>
 		Hosted by <span id="host">',entScape($eFetch['eHost']),'</span><br>';
@@ -37,7 +37,7 @@ if ($count > 0)
 }	
 else
 {
-	echo 'No upcoming events posted.';
+	echo '<div id="nEvent">No upcoming events posted.</div>';
 }
 include 'config/footer.php';
 ob_end_flush();

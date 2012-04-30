@@ -6,7 +6,8 @@ exclusively on http://dkunderground.org .
 
 Requirements
 ------------
-Apache with .htaccess files allowed, MSSQL exension enabled, and PHP enabled.
+Apache with .htaccess files enabled, PHP enabled, and PDO ODBC (windows) or PDO 
+DBLIB (linux) extension enabled.
 
 Installation
 ------------

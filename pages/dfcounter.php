@@ -1,14 +1,14 @@
 <?php
 $hour_wars = array();
 $query = msquery("Select sort_cd from character.dbo.cm_bcd_item order by orderby_no asc");
-while ($fetch = mssql_fetch_array($query))
+foreach($query as $fetch)
 {
-$hour_wars[] = $fetch['sort_cd'];
+	$hour_wars[] = $fetch['sort_cd'];
 }
 $search = array_search(0, $hour_wars);
 if ($search !== false)
 {
-$hour_wars[$search] = 24;
+	$hour_wars[$search] = 24;
 }
 sort($hour_wars);
 $hour_now = date('G');
@@ -21,7 +21,6 @@ foreach($hour_wars as $hour_war)
 		break;
 	}
 }
-
 $wartime = (mktime($hour_next, 0, 0) - time());
 ?>
 
