@@ -19,7 +19,7 @@ if(isset($_POST['build']))
 	// create userExt table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'userExt' and xtype = 'U') CREATE TABLE %s.dbo.userExt (user_no varchar (20) collate Chinese_PRC_CI_AS, user_id varchar (20) collate Chinese_PRC_CI_AS, exp bigint default (0), dil bigint default (0))", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create rebirth table
-	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'rebirth' and xtype = 'U') CREATE TABLE %s.dbo.rebirth (character_no varchar (18) collate Chinese_PRC_CI_AS, rebirth int)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
+	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'rebirth' and xtype = 'U') CREATE TABLE %s.dbo.rebirth (character_no varchar (18) collate Chinese_PRC_CI_AS, rbtime datetime)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create tickets table
 	msquery("IF NOT EXISTS (SELECT name FROM %s.dbo.sysobjects WHERE name = 'tickets' and xtype = 'U') CREATE TABLE %s.dbo.tickets (tid varchar (50) PRIMARY KEY, type varchar (50), owner varchar (50) collate Chinese_PRC_CI_AS, title varchar (20), status int, topen datetime, lby varchar (50) null)", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB']);
 	// create ticket_post table

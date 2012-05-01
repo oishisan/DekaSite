@@ -16,15 +16,13 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 		$ccFetch = $cQuery->fetchAll();
 		if(count($ccFetch) == 1)
 		{
-			$cQuery = msquery("select character.dbo.user_character.character_no, byPCClass, wLevel, rebirth from character.dbo.user_character left join %s.dbo.rebirth on %s.dbo.rebirth.character_no = character.dbo.user_character.character_no where character_name = '%s' and user_no = '%s'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'],$_POST['rchar'], $_SESSION['user_no']);
+			$cQuery = msquery("select c.character_no, byPCClass, wLevel, count(r.character_no) as num from character.dbo.user_character c left join %s.dbo.rebirth r on r.character_no = c.character_no where character_name = '%s' and user_no = '%s' group by c.character_no, byPCClass, wLevel", $ini['MSSQL']['extrasDB'], $_POST['rchar'], $_SESSION['user_no']);
 			$cFetch = $cQuery->fetchAll();
 			if(count($cFetch) == 1)
 			{
-				if($cFetch[0]['rebirth'] == null || $cFetch[0]['rebirth'] < $count)
+				if($cFetch[0]['num'] < $count)
 				{
-					$rCount = 0;
-					if($cFetch[0]['rebirth'] != null) $rCount = $cFetch[0]['rebirth'];
-					$rArray = explode(',',$ini['Other']['rebirth'][$rCount]);
+					$rArray = explode(',',$ini['Other']['rebirth'][$cFetch[0]['num']]);
 					if($cFetch[0]['wLevel'] >= $rArray[0])
 					{
 						if($ccFetch[0]['total'] != null && $ccFetch[0]['total'] >= $rArray[2])
@@ -34,27 +32,17 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 								$_POST['loc'] = 0;
 							}
 							$rLoc = explode(',',$ini['Other']['rebirth.location'][$_POST['loc']]);
-							msquery("UPDATE cash.dbo.user_cash SET amount = amount - '%s' where user_no = '%s'", $rArray[2], $_SESSION['user_no']);
-							if($cFetch[0]['rebirth'] == null)
+							if($rArray[2] > 0) msquery("UPDATE cash.dbo.user_cash SET amount = amount - '%s' where user_no = '%s'", $rArray[2], $_SESSION['user_no']);
+							msquery("insert into %s.dbo.rebirth values ('%s', '%s')", $ini['MSSQL']['extrasDB'], $cFetch[0]['character_no'], date('n/j/Y g:i:s A'));
+							$sQuery = msquery("SELECT wStr, wCon, wDex, wSpr, wLevel from character.dbo.user_character where character_no = 'DEKARON%s000001'", $cFetch[0]['byPCClass']); 
+							$sFetch = $sQuery->fetch();
+							$stats = 0;
+							for($i = 0; $i <= ($cFetch[0]['num']+1); $i++)
 							{
-								msquery("INSERT into %s.dbo.rebirth values ('%s','1')", $ini['MSSQL']['extrasDB'], $cFetch[0]['character_no']);
-								$sQuery = msquery("SELECT wStr, wCon, wDex, wSpr, wLevel from character.dbo.user_character where character_no = 'DEKARON%s000001'", $cFetch[0]['byPCClass']); 
-								$sFetch = $sQuery->fetch();
-								msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $rArray[1], $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
+								$rArray = explode(',',$ini['Other']['rebirth'][$i-1]);
+								$stats += $rArray[1];
 							}
-							else
-							{
-								msquery("update %s.dbo.rebirth set rebirth = rebirth +1 where character_no = '%s'", $ini['MSSQL']['extrasDB'], $cFetch[0]['character_no']);
-								$sQuery = msquery("SELECT wStr, wCon, wDex, wSpr, wLevel from character.dbo.user_character where character_no = 'DEKARON%s000001'", $cFetch[0]['byPCClass']); 
-								$sFetch = $sQuery->fetch();
-								$stats = 0;
-								for($i = 1; $i <= ($cFetch[0]['rebirth']+1); $i++)
-								{
-									$rArray = explode(',',$ini['Other']['rebirth'][$i-1]);
-									$stats += $rArray[1];
-								}
-								msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $stats, $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
-							}
+							msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $stats, $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
 							if($ini['Other']['rebirth.SkillPoint'] == true)
 							{
 								msquery("UPDATE character.dbo.user_character SET wSkillPoint = '0' WHERE character_name = '%s'", $_POST['rchar']);
@@ -64,9 +52,9 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 								msquery("DELETE FROM character.dbo.user_slot WHERE character_no = '%s'", $cFetch[0]['character_no']);
 								msquery("DELETE FROM character.dbo.user_skill WHERE character_no = '%s'", $cFetch[0]['character_no']);
 							}
-							if(isset($ini['Other']['rebirth'.($rCount+1).'.send']))
+							if(isset($ini['Other']['rebirth'.($cFetch[0]['num']+1).'.send']))
 							{
-								foreach($ini['Other']['rebirth'.($rCount+1).'.send'] as $x)
+								foreach($ini['Other']['rebirth'.($cFetch[0]['num']+1).'.send'] as $x)
 								{
 									$send = explode(',',$x);
 									msquery("EXEC character.dbo.SP_POST_SEND_OP '%s','Rebirth',1,'Rebirth bonus','Congratulations on your rebirth!','%s','%s',0",$cFetch[0]['character_no'], $send[0], $send[1]);
@@ -99,7 +87,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 			echo 'Please logout of the game.<br>';
 		}
 	}
-	$cQuery = msquery("select character_name, rebirth from account.dbo.user_profile left join character.dbo.user_character on character.dbo.user_character.user_no = account.dbo.user_profile.user_no left join %s.dbo.rebirth on character.dbo.user_character.character_no = %s.dbo.rebirth.character_no where (rebirth < '%s' or rebirth is null) and account.dbo.user_profile.user_no = '%s'", $ini['MSSQL']['extrasDB'], $ini['MSSQL']['extrasDB'], $count, $_SESSION['user_no']);
+	$cQuery = msquery("select c.character_name, count(r.character_no) as num from account.dbo.user_profile up left join character.dbo.user_character c on c.user_no = up.user_no left join %s.dbo.rebirth r on c.character_no = r.character_no where up.user_no = '%s' group by c.character_name having count(r.character_no) < '%s'", $ini['MSSQL']['extrasDB'], $_SESSION['user_no'], $count);
 	$cQuery = $cQuery->fetchAll();
 	if(count($cQuery) > 0)
 	{
@@ -115,7 +103,7 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 		foreach($cQuery as $cFetch)
 		{
 			if($cFetch['rebirth'] == null) $cFetch['rebirth'] = 0;
-			echo '<option value="',entScape($cFetch['character_name']),'">',entScape($cFetch['character_name']),' (',entScape($cFetch['rebirth']),')</option>';
+			echo '<option value="',entScape($cFetch['character_name']),'">',entScape($cFetch['character_name']),' (',entScape($cFetch['num']),')</option>';
 		}
 		echo '</select><br><input type="submit" name="rebirth" value="Rebirth" /></form>';
 	}
