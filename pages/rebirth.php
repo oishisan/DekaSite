@@ -37,9 +37,9 @@ if(isset($ini['Other']['rebirth']) && isset($ini['Other']['rebirth.location']))
 							$sQuery = msquery("SELECT wStr, wCon, wDex, wSpr, wLevel from character.dbo.user_character where character_no = 'DEKARON%s000001'", $cFetch[0]['byPCClass']); 
 							$sFetch = $sQuery->fetch();
 							$stats = 0;
-							for($i = 0; $i <= ($cFetch[0]['num']+1); $i++)
+							for($i = 0; $i < ($cFetch[0]['num']+1); $i++)
 							{
-								$rArray = explode(',',$ini['Other']['rebirth'][$i-1]);
+								$rArray = explode(',',$ini['Other']['rebirth'][$i]);
 								$stats += $rArray[1];
 							}
 							msquery("UPDATE character.dbo.user_character SET wStr = '%s', wSpr = '%s', wCon = '%s', wDex = '%s', wLevel = '%s', wStatPoint = '%s', wPosX = '%s', wPosY = '%s', wMapIndex = '%s', dwExp = '0' where character_name = '%s'", $sFetch['wStr'], $sFetch['wSpr'], $sFetch['wCon'], $sFetch['wDex'], $sFetch['wLevel'], $stats, $rLoc[1], $rLoc[2], $rLoc[0], $_POST['rchar']);
