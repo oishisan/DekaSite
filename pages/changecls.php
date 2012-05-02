@@ -94,7 +94,7 @@ if($_GET['action'] == 'change' && isset($_POST['char']) && isset($_POST['cls']))
 		$error = 'Class was successfully changed for '.$_POST['char'].'.';
 	}
 }
-$cQuery = msquery("select c.character_name from account.dbo.user_profile up left join character.dbo.user_character c on c.user_no = up.user_no where up.user_no = '%s'", $_SESSION['user_no']);
+$cQuery = msquery("select character_name from character.dbo.user_character c join account.dbo.user_profile up on c.user_no = up.user_no where up.user_no = '%s'", $_SESSION['user_no']);
 $cQuery = $cQuery->fetchAll();
 if(count($cQuery) > 0)
 {
