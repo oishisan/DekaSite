@@ -33,7 +33,7 @@ if(isset($_POST['upass']))
 	{
 		echo 'The new passwords do not match!';
 	}
-	elseif($count1['user_pwd'] <> md5($_POST['old']))
+	elseif($fetch['user_pwd'] <> md5($_POST['old']))
 	{
 		echo 'Invalid password!';
 	}
