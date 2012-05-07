@@ -27,7 +27,7 @@ if(isset($_POST['build']))
 	// import existing ids to userExt
 	$iQuery = msquery("select user_no, user_id from account.dbo.user_profile where not exists(select user_id from %s.dbo.userExt)", $ini['MSSQL']['extrasDB']);
 	$iQuery = $iQuery -> fetchAll();
-	while($iQuery as $iFetch)
+	foreach($iQuery as $iFetch)
 	{
 		msquery("INSERT INTO %s.dbo.userExt (user_no, user_id) values ('%s', '%s')", $ini['MSSQL']['extrasDB'], $iFetch['user_no'], $iFetch['user_id']);
 	}
