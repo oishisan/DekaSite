@@ -51,6 +51,6 @@ else
 		<br>User ID: <input type="text" name="authID" /><br>Authority: <input type="text" name="auth" value="Admin" /><br>Web name: <input type="text" name="authN" /><br>';
 	}
 	echo'<input type="submit" name="build" value="Build Tables" /></form>';
-	}
+	
 }
 ?>
